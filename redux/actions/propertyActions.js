@@ -3,35 +3,44 @@
 // import fetch from 'isomorphic-unfetch';
 import axios from 'axios';
 import { Message } from 'antd';
-import { SERVICE_ERR, ADD_SERVICE, DELETE_SERVICE, EDIT_SERVICE, GET_SERVICES, GET_SERVICE } from '../actionTypes';
+import {
+	PROPERTY_ERR,
+	ADD_PROPERTY,
+	DELETE_PROPERTY,
+	EDIT_PROPERTY,
+	GET_PROPERTYS,
+	GET_PROPERTY,
+} from '../actionTypes';
 import { getCookie } from './authActions';
 
-export const getServices = () => (dispatch) => {
+export const getProperties = () => (dispatch) => {
 	axios
-		.get(`/api/service`)
+		.get(`/api/property`)
 		.then((response) => {
 			if (response.data.msg) {
 				Message.error(response.data.msg);
-				return dispatch({ type: SERVICE_ERR, payload: response.data.msg });
+				return dispatch({ type: PROPERTY_ERR, payload: response.data.msg });
 			}
 			let final = response.data.result.filter((data) => {
 				data.key = data._id;
 				return data;
 			});
 			// Message.success('Sign complete. Taking you to your dashboard!').then(() => Router.push('/dashboard'));
-			dispatch({ type: GET_SERVICES, payload: final });
+			dispatch({ type: GET_PROPERTYS, payload: final });
 		})
 		.catch((err) => {
 			console.log(err);
 			Message.error(response.data.msg);
-			return dispatch({ type: SERVICE_ERR, payload: response.data.msg });
+			return dispatch({ type: PROPERTY_ERR, payload: response.data.msg });
 		});
 };
 
-export const getServicesLocal = async () => {
+export const getPropertyLocal = async () => {
 	try {
-		const res = await axios.get(`/api/service`);
+		const res = await axios.get(`/api/property`);
 		const data = await res.data;
+		// console.log(data);
+
 		if (data.msg) {
 			Message.error(data.msg);
 			return;
@@ -42,38 +51,35 @@ export const getServicesLocal = async () => {
 		});
 		return final;
 	} catch (error) {
-		if (error.response.data.msg) {
-			Message.error(error.response.data.msg);
-			return;
-		}
+		console.log(error);
+		Message.error(error.response.data.msg);
+		return;
 	}
 };
 
-export const getService = (id) => (dispatch) => {
+export const getProperty = (id) => (dispatch) => {
 	axios
-		.get(`/api/service/${id}`)
+		.get(`/api/property/${id}`)
 		.then((response) => {
 			if (response.data.msg) {
 				Message.error(response.data.msg);
-				return dispatch({ type: SERVICE_ERR, payload: response.data.msg });
+				return dispatch({ type: PROPERTY_ERR, payload: response.data.msg });
 			}
 			// Message.success('Sign complete. Taking you to your dashboard!').then(() => Router.push('/dashboard'));
-			dispatch({ type: GET_SERVICE, payload: response.result });
+			dispatch({ type: GET_PROPERTY, payload: response.data.result });
 		})
 		.catch((err) => {
-			console.log(err.response);
-			if (err.response.data.msg) {
-				Message.error(err.response.data.msg);
-				return dispatch({ type: SERVICE_ERR, payload: err.response.data.msg });
-			}
+			console.log(err);
+			Message.error(err.response.data.msg);
+			return dispatch({ type: PROPERTY_ERR, payload: err.response.data.msg });
 		});
 };
 
-export const deleteService = (id) => (dispatch) => {
+export const deleteProperty = (id) => (dispatch) => {
 	const token = getCookie('token');
 	// console.log(id);
 	axios
-		.delete(`/api/service/${id}`, {
+		.delete(`/api/property/${id}`, {
 			headers: {
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
@@ -82,22 +88,22 @@ export const deleteService = (id) => (dispatch) => {
 		})
 		.then((result) => {
 			if (result.data.success) {
-				Message.success('Service is deleted successfully');
-				return dispatch(getServices());
+				Message.success('Property is deleted successfully');
+				return dispatch(getProperties());
 			}
-			Message.error('Error while deleting the service');
+			Message.error('Error while deleting the property');
 		})
 		.catch((err) => {
-			Message.error('Unable to delete this service');
-			return console.log(err.response);
+			Message.error('Unable to delete this property');
+			return console.log(err.response.data);
 		});
 };
 
-export const addService = (body) => (dispatch) => {
+export const addProperty = (body) => (dispatch) => {
 	const token = getCookie('token');
 	// console.log(token, body);
 	axios
-		.post(`/api/service`, body, {
+		.post(`/api/property`, body, {
 			headers: {
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
@@ -106,24 +112,24 @@ export const addService = (body) => (dispatch) => {
 		})
 		.then((result) => {
 			if (result.data.success) {
-				Message.success('Service is added successfully');
-				// dispatch({ type: ADD_SERVICE, payload: result.data });
-				return dispatch(getServices());
+				Message.success('Property is added successfully');
+				// dispatch({ type: ADD_PROPERTY, payload: result.data });
+				return dispatch(getProperties());
 			}
 			// console.log(result);
-			Message.error('Error while adding service');
+			Message.error('Error while adding property');
 		})
 		.catch((err) => {
 			// console.log(err);
-			Message.error('Unable to add this service');
+			Message.error('Unable to add this property');
 			return console.log(err.response);
 		});
 };
 
-export const editService = (body, id) => (dispatch) => {
+export const editProperty = (body, id) => (dispatch) => {
 	const token = getCookie('token');
 	axios
-		.patch(`/api/service/${id}`, body, {
+		.patch(`/api/property/${id}`, body, {
 			headers: {
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
@@ -132,15 +138,15 @@ export const editService = (body, id) => (dispatch) => {
 		})
 		.then((result) => {
 			if (result.data.success) {
-				Message.success('Service status is changed successfully');
-				dispatch({ type: EDIT_SERVICE, payload: {} });
-				return dispatch(getServices());
+				Message.success('Property status is changed successfully');
+				dispatch({ type: EDIT_PROPERTY, payload: {} });
+				return dispatch(getProperties());
 			}
 			// console.log(result);
-			Message.error('Error while updating the service');
+			Message.error('Error while updating the property');
 		})
 		.catch((err) => {
-			Message.error('Unable to change this service status');
+			Message.error('Unable to change this property status');
 			return console.log(err.response);
 		});
 };

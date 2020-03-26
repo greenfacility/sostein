@@ -13,10 +13,6 @@ export const USERSINFO = 'USERSINFO';
 export const NIGHTMODE = 'NIGHTMODE';
 export const EDITUSERINFO = 'EDITUSERINFO';
 
-// API URL
-// export const URL = 'https://newgreentemplate.now.sh';
-export const URL = 'http://localhost:3000';
-
 // REQUEST APIS ACTIONS
 export const GET_REQUESTS = 'GET_REQUESTS';
 export const CHANGE_REQUEST_STATUS = 'CHANGE_REQUEST_STATUS';
@@ -40,6 +36,14 @@ export const ADD_LOCATION = 'ADD_LOCATION';
 export const EDIT_LOCATION = 'EDIT_LOCATION';
 export const DELETE_LOCATION = 'DELETE_LOCATION';
 export const LOCATION_ERR = 'LOCATION_ERR';
+
+// PROPERTY APIS ACTIONS
+export const GET_PROPERTY = 'GET_PROPERTY';
+export const GET_PROPERTYS = 'GET_PROPERTYS';
+export const ADD_PROPERTY = 'ADD_PROPERTY';
+export const EDIT_PROPERTY = 'EDIT_PROPERTY';
+export const DELETE_PROPERTY = 'DELETE_PROPERTY';
+export const PROPERTY_ERR = 'PROPERTY_ERR';
 
 // UX ACTIONS
 export const REQUESTING = 'REQUESTING';

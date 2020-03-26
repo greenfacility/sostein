@@ -1,8 +1,9 @@
 // import cookie from 'react-cookies';
 // import Router from 'next/router';
+// import fetch from 'isomorphic-unfetch';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
-import fetch from 'isomorphic-unfetch';
+import axios from 'axios';
 import { Message } from 'antd';
 import {
 	ADD_REQUEST,
@@ -11,18 +12,16 @@ import {
 	GET_REQUESTS,
 	CHANGE_REQUEST_STATUS,
 	REQUEST_ERR,
-	URL,
 } from '../actionTypes';
 import { getCookie } from './authActions';
 
 export const getRequests = (user) => (dispatch) => {
-	fetch(`${URL}/api/request`, {
-		method: 'GET',
-	})
-		.then((data) => data.json())
+	axios
+		.get(`/api/request`)
 		.then((response) => {
-			if (response.status) {
-				const final = response.result.map((data) => {
+			if (response.data.status) {
+				const final = response.data.result.map((data) => {
+					var date = new Date(data.timestart);
 					let dt = {
 						_id: data._id,
 						key: data._id,
@@ -33,8 +32,11 @@ export const getRequests = (user) => (dispatch) => {
 						status: data.status,
 						picture: data.picture,
 						rating: data.rating,
+						assigned: data.assigned,
+						assignedId: data.assignedId,
 						description: data.description,
 						timestart: data.timestart,
+						date: date.toDateString(),
 						timecompleted: data.timecompleted,
 					};
 					// data.key = data._id;
@@ -50,52 +52,62 @@ export const getRequests = (user) => (dispatch) => {
 				return dispatch({ type: GET_REQUESTS, payload: solution });
 			}
 			// Message.success('Sign complete. Taking you to your dashboard!').then(() => Router.push('/dashboard'));
-			Message.error(response.msg);
-			return dispatch({ type: REQUEST_ERR, payload: response.msg });
+			Message.error(response.data.msg);
+			return dispatch({ type: REQUEST_ERR, payload: response.data.msg });
 		})
-		.catch((err) => console.log(err));
+		.catch((err) => {
+			console.log(err);
+			Message.error(err.response.data.msg);
+			return dispatch({ type: REQUEST_ERR, payload: err.response.data.msg });
+		});
 };
 
 export const getRequestLocal = async (user) => {
 	// console.log(getGroup());
-	const res = await fetch(`${URL}/api/request`, {
-		method: 'GET',
-	});
+	try {
+		const res = await axios.get(`/api/request`);
 
-	const data = await res.json();
+		const data = await res.data;
 
-	if (data.msg) {
-		// Message.error(data.msg);
-		console.error(data.msg);
-		return;
-	}
-	const final = data.result.map((data) => {
-		let dt = {
-			_id: data._id,
-			key: data._id,
-			name: data.name,
-			type: `${data.type.name}, ${data.type.type}`,
-			from: `${data.from.firstname} ${data.from.lastname}`,
-			by_id: data.from._id,
-			status: data.status,
-			timestart: data.timestart,
-			picture: data.picture,
-			rating: data.rating,
-			description: data.description,
-			timecompleted: data.timecompleted,
-		};
-		// data.key = data._id;
-		return dt;
-	});
-	let solution = final;
-	if (user.usertype !== 'manager') {
-		if (user.usertype !== 'admin') {
-			solution = final.filter((dt) => dt.by_id === user._id);
+		if (data.msg) {
+			// Message.error(data.msg);
+			console.error(data.msg);
+			return;
 		}
+		const final = data.result.map((data) => {
+			var date = new Date(data.timestart);
+			let dt = {
+				_id: data._id,
+				key: data._id,
+				name: data.name,
+				type: `${data.type.name}, ${data.type.type}`,
+				from: `${data.from.firstname} ${data.from.lastname}`,
+				by_id: data.from._id,
+				status: data.status,
+				timestart: data.timestart,
+				date: date.toDateString(),
+				assigned: data.assigned,
+				assignedId: data.assignedId,
+				picture: data.picture,
+				rating: data.rating,
+				description: data.description,
+				timecompleted: data.timecompleted,
+			};
+			// data.key = data._id;
+			return dt;
+		});
+		let solution = final;
+		if (user.usertype !== 'manager') {
+			if (user.usertype !== 'admin') {
+				solution = final.filter((dt) => dt.by_id === user._id);
+			}
+		}
+		// console.log(user.usertype, 'admin');
+		// console.log(solution);
+		return solution;
+	} catch (error) {
+		console.error(error.response);
 	}
-	// console.log(user.usertype, 'admin');
-	// console.log(solution);
-	return solution;
 };
 
 export const getDayRequestNo = (datas, week, day) => {
@@ -151,14 +163,13 @@ export const getDayRequestNo = (datas, week, day) => {
 };
 
 export const getRequest = (id) => (dispatch) => {
-	fetch(`${URL}/api/request/${id}`, {
-		method: 'GET',
-	})
-		.then((data) => data.json())
+	axios
+		.get(`/api/request/${id}`)
 		.then((response) => {
 			// console.log(response);
-			if (response.success) {
-				const data = response.result;
+			if (response.data.success) {
+				const data = response.data.result;
+				var date = new Date(data.timestart);
 				let dt = {
 					_id: data._id,
 					key: data._id,
@@ -168,34 +179,39 @@ export const getRequest = (id) => (dispatch) => {
 					by_id: data.from._id,
 					status: data.status,
 					picture: data.picture,
+					assigned: data.assigned,
+					assignedId: data.assignedId,
 					rating: data.rating,
 					description: data.description,
+					date: date.toDateString(),
 					timestart: data.timestart,
 					timecompleted: data.timecompleted,
 				};
 				return dispatch({ type: GET_REQUEST, payload: dt });
 			}
 			// Message.success('Sign complete. Taking you to your dashboard!').then(() => Router.push('/dashboard'));
-			Message.error(response.msg);
-			return dispatch({ type: REQUEST_ERR, payload: response.msg });
+			Message.error(response.data.msg);
+			return dispatch({ type: REQUEST_ERR, payload: response.data.msg });
 		})
-		.catch((err) => console.log(err));
+		.catch((err) => {
+			console.log(err);
+			Message.error(err.response.data.msg);
+			return dispatch({ type: REQUEST_ERR, payload: err.response.data.msg });
+		});
 };
 
 export const deleteRequest = (id, user) => (dispatch) => {
 	const token = getCookie('token');
-	fetch(`${URL}/api/request/${id}`, {
-		method: 'DELETE',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			Authorization: `${token}`,
-		},
-		body: JSON.stringify({}),
-	})
-		.then((data) => data.json())
+	axios
+		.delete(`/api/request/${id}`, {
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				Authorization: `${token}`,
+			},
+		})
 		.then((result) => {
-			if (result.success) {
+			if (result.data.success) {
 				Message.success('Request is deleted successfully');
 				return dispatch(getRequests(user));
 			}
@@ -203,7 +219,7 @@ export const deleteRequest = (id, user) => (dispatch) => {
 		})
 		.catch((err) => {
 			Message.error('Unable to delete this request');
-			return console.log(err);
+			return console.log(err.reponse);
 		});
 };
 
@@ -211,18 +227,16 @@ export const addRequest = (body, user) => (dispatch) => {
 	body.from = user._id;
 	// console.log(body);
 	const token = getCookie('token');
-	fetch(`${URL}/api/request`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			Authorization: `${token}`,
-		},
-		body: JSON.stringify(body),
-	})
-		.then((data) => data.json())
+	axios
+		.post(`/api/request`, body, {
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				Authorization: `${token}`,
+			},
+		})
 		.then((result) => {
-			if (result.success) {
+			if (result.data.success) {
 				Message.success('Request is added successfully');
 				return dispatch(getRequests(user));
 			}
@@ -230,25 +244,23 @@ export const addRequest = (body, user) => (dispatch) => {
 		})
 		.catch((err) => {
 			Message.error('Unable to add this request');
-			return console.log(err);
+			return console.log(err.response);
 		});
 };
 
 export const changeRequestStatus = (body, id, user) => (dispatch) => {
 	const token = getCookie('token');
 	const data = { status: body.status };
-	fetch(`${URL}/api/request/${id}`, {
-		method: 'PATCH',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			Authorization: `${token}`,
-		},
-		body: JSON.stringify(data),
-	})
-		.then((data) => data.json())
+	axios
+		.patch(`/api/request/${id}`, data, {
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				Authorization: `${token}`,
+			},
+		})
 		.then((result) => {
-			if (result.success) {
+			if (result.data.success) {
 				Message.success('Request status is changed successfully');
 				return dispatch(getRequests(user));
 			}
@@ -256,7 +268,7 @@ export const changeRequestStatus = (body, id, user) => (dispatch) => {
 		})
 		.catch((err) => {
 			Message.error('Unable to change this request status');
-			return console.log(err);
+			return console.log(err.response);
 		});
 };
 
@@ -265,18 +277,16 @@ export const changeRating = (body, id, user) => (dispatch) => {
 	const data = { rating: body };
 	// console.log(data);
 	if (user.usertype !== 'user') return;
-	fetch(`${URL}/api/request/${id}`, {
-		method: 'PATCH',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			Authorization: `${token}`,
-		},
-		body: JSON.stringify(data),
-	})
-		.then((data) => data.json())
+	axios
+		.patch(`/api/request/${id}`, data, {
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				Authorization: `${token}`,
+			},
+		})
 		.then((result) => {
-			if (result.success) {
+			if (result.data.success) {
 				Message.success('Request rating is changed successfully');
 				return dispatch(getRequests(user));
 			}
@@ -284,6 +294,32 @@ export const changeRating = (body, id, user) => (dispatch) => {
 		})
 		.catch((err) => {
 			Message.error('Unable to change this request rating');
-			return console.log(err);
+			return console.log(err.response);
+		});
+};
+
+export const assignMember = (body, id, user) => (dispatch) => {
+	const token = getCookie('token');
+	const data = { assigned: body.name, assignedId: body.id };
+	// console.log(data);
+	if (user.usertype !== 'manager') return;
+	axios
+		.patch(`/api/request/${id}`, data, {
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				Authorization: `${token}`,
+			},
+		})
+		.then((result) => {
+			if (result.data.success) {
+				Message.success('Team Member is Assigned Successfully');
+				return dispatch(getRequests(user));
+			}
+			Message.error('Error while assigning team member');
+		})
+		.catch((err) => {
+			Message.error('Unable to assign team member');
+			return console.log(err.response);
 		});
 };

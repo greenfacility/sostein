@@ -3,6 +3,7 @@ import authReducer from './authReducer';
 import requests from './requestReducer';
 import services from './serviceReducer';
 import locations from './locationReducer';
+import properties from './propertyReducer';
 import foruser from './userReducer';
 import ux from './uxReducer';
 // import { brandFilterReducer } from './brand.filter.reducer';
@@ -14,6 +15,7 @@ const rootReducer = combineReducers({
 	requests,
 	services,
 	locations,
+	properties,
 	foruser,
 	ux,
 	// brandFilter: brandFilterReducer,

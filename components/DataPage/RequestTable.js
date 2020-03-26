@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { MoreVertical, Edit, Trash, PlusCircle } from 'react-feather';
 import AddData from '../Datas/Requests/AddData';
 import EditData from '../Datas/Requests/EditData';
+import AssignMember from '../Datas/Requests/AssignMember';
 import { deleteRequest } from '../../redux/actions';
 import Rater from '../Rating/Rater';
 
@@ -80,6 +81,13 @@ class RequestTable extends Component {
 				...this.getColumnSearchProps('name'),
 			},
 			{
+				title: 'Date',
+				dataIndex: 'date',
+				key: 'date',
+				width: '20%',
+				...this.getColumnSearchProps('date'),
+			},
+			{
 				title: 'Type',
 				dataIndex: 'type',
 				key: 'type',
@@ -101,6 +109,13 @@ class RequestTable extends Component {
 				...this.getColumnSearchProps('status'),
 			},
 			{
+				title: 'Assigned',
+				dataIndex: 'assigned',
+				key: 'assigned',
+				width: '10%',
+				...this.getColumnSearchProps('assigned'),
+			},
+			{
 				title: 'Rating',
 				dataIndex: 'rating',
 				key: 'rating',
@@ -119,6 +134,7 @@ class RequestTable extends Component {
 							overlay={
 								<Menu>
 									<EditData id={record._id} />
+									<AssignMember id={record._id} />
 									{usertype !== 'user' && (
 										<Menu.Item
 											onClick={(e) =>
@@ -141,6 +157,7 @@ class RequestTable extends Component {
 		];
 
 		var data = columns;
+		// console.log(data);
 		if (usertype !== 'manager') {
 			if (usertype !== 'team-member') {
 				// data = columns.filter((cols) => cols.key !== 'action');
@@ -149,11 +166,13 @@ class RequestTable extends Component {
 			}
 		}
 
-		var pendingReq = this.props.requests.requests.filter((dt) => dt.status === 'pending');
-		var ongoingReq = this.props.requests.requests.filter((dt) => dt.status === 'on-going');
-		var holdReq = this.props.requests.requests.filter((dt) => dt.status === 'hold');
-		var parkReq = this.props.requests.requests.filter((dt) => dt.status === 'pack');
-		var doneReq = this.props.requests.requests.filter((dt) => dt.status === 'done');
+		var requests = this.props.requests.requests;
+
+		var pendingReq = requests.filter((dt) => dt.status === 'pending');
+		var ongoingReq = requests.filter((dt) => dt.status === 'on-going');
+		var holdReq = requests.filter((dt) => dt.status === 'hold');
+		var parkReq = requests.filter((dt) => dt.status === 'pack');
+		var doneReq = requests.filter((dt) => dt.status === 'done');
 
 		return (
 			<Card title="Work Order Lists" style={{ padding: '0 !important', overflow: 'auto' }} extra={<AddData />}>

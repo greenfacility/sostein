@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import RequestTable from './DataPage/RequestTable';
 import ServiceTable from './DataPage/ServiceTable';
 import LocationTable from './DataPage/OurlocationTable';
+import PropertyTable from './DataPage/PropertyTable';
 import UserTable from './DataPage/UserTable';
 
 export default class Data extends Component {
@@ -13,6 +14,9 @@ export default class Data extends Component {
 				</div>
 				<div className="mb-4">
 					<ServiceTable />
+				</div>
+				<div className="mb-4">
+					<PropertyTable />
 				</div>
 				<div className="mb-4">
 					<LocationTable />

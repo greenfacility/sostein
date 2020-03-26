@@ -91,9 +91,12 @@ class EditData extends Component {
 		// );
 		return (
 			<div>
-				<Button type="primary" onClick={(e) => this.showModal(this.props.id)}>
-					Change Request Status
-				</Button>
+				{usertype !== 'user' ||
+					(usertype !== 'team-member' && (
+						<Button type="primary" onClick={(e) => this.showModal(this.props.id)}>
+							Change Status
+						</Button>
+					))}
 				<Modal
 					visible={visible}
 					title="Change Status"

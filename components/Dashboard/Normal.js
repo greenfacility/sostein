@@ -29,15 +29,10 @@ import {
 	YAxis,
 } from 'react-vis';
 
-import { curveCatmullRom } from 'd3-shape';
-
 import NoSSR from 'react-no-ssr';
-import PostCard from '../shared/PostCard';
-import StatCard from '../shared/StatCard';
-import WeatherCard from '../shared/WeatherCard';
 import styled from 'styled-components';
-import { theme } from '../styles/GlobalStyles';
 import RequestTable from '../DataPage/RequestTable';
+import PropertyTable from '../DataPage/PropertyTable';
 import { useState } from 'react';
 import { connect } from 'react-redux';
 import { getDayRequestNo } from '../../redux/actions';
@@ -207,6 +202,7 @@ const Overview = (props) => {
 				</NoSSR>
 			</Card>
 			<RequestTable />
+			<PropertyTable />
 		</div>
 	);
 };

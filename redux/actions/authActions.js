@@ -3,31 +3,25 @@ import cookie from 'react-cookies';
 import Router from 'next/router';
 import { Message } from 'antd';
 import fetch from 'isomorphic-unfetch';
-import { AUTHENTICATE, DEAUTHENTICATE, REGISTER, USERINFO, AUTH_ERROR, URL } from '../actionTypes';
+import axios from 'axios';
+import { AUTHENTICATE, DEAUTHENTICATE, REGISTER, USERINFO, AUTH_ERROR } from '../actionTypes';
 
 export const authenticate = (user) => (dispatch) => {
 	// console.log(user);
-	fetch(`${URL}/api/user`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(user),
-	})
-		.then((data) => data.json())
+	axios
+		.post('/api/user', user)
 		.then((response) => {
-			// console.log('ok set cookie', response);
-			if (!response.token) {
-				Message.error(response.msg);
-				return dispatch({ type: AUTH_ERROR, payload: response.msg });
-			}
-			setCookie('token', response.token);
+			// console.log('ok set cookie', response.status);
+			setCookie('token', response.data.token);
 			Message.success('Sign complete. Taking you to your dashboard!').then(() => Router.push('/dashboard'));
-			dispatch({ type: USERINFO, payload: response.user });
-			dispatch({ type: AUTHENTICATE, payload: response.token });
+			dispatch({ type: USERINFO, payload: response.data.user });
+			dispatch({ type: AUTHENTICATE, payload: response.data.token });
 		})
-		.catch((err) => console.log(err));
+		.catch((err) => {
+			console.log(err.response.data);
+			Message.error(err.response.data.msg);
+			return dispatch({ type: AUTH_ERROR, payload: err.response.data.msg });
+		});
 };
 
 export const deauthenticate = () => {
@@ -40,85 +34,80 @@ export const deauthenticate = () => {
 
 export const register = (user) => (dispatch) => {
 	// console.log(user);
-	fetch(`${URL}/api/user`, {
-		method: 'PUT',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(user),
-	})
-		.then((data) => data.json())
+	axios
+		.put('/api/user', user)
 		.then((response) => {
-			// console.log('ok set cookie', response.token);
-			// console.log(response);
-			if (!response.token) {
-				Message.error(response.msg);
-				return dispatch({ type: AUTH_ERROR, payload: response.msg });
-			}
-			setCookie('token', response.token);
+			// console.log('ok set cookie', response.status);
+			setCookie('token', response.data.token);
 			Message.success('Sign complete. Taking you to your dashboard!').then(() => Router.push('/dashboard'));
-			dispatch({ type: USERINFO, payload: response.user });
-			dispatch({ type: REGISTER, payload: response.token });
+			dispatch({ type: USERINFO, payload: response.data.user });
+			dispatch({ type: AUTHENTICATE, payload: response.data.token });
+			dispatch({ type: REGISTER, payload: response.data.token });
 		})
-		.catch((err) => console.log(err));
+		.catch((err) => {
+			console.log(err.response.data);
+			Message.error(err.response.data.msg);
+			return dispatch({ type: AUTH_ERROR, payload: err.response.data.msg });
+		});
 };
 
 export const editProfile = (user, id) => (dispatch) => {
 	const token = getCookie('token');
-	// console.log(user);
-	fetch(`${URL}/api/user/${id}`, {
-		method: 'PATCH',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			Authorization: `${token}`,
-		},
-		body: JSON.stringify(user),
-	})
-		.then((data) => data.json())
+
+	axios
+		.patch(`/api/user/${id}`, user, {
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				Authorization: `${token}`,
+			},
+		})
 		.then((response) => {
 			// console.log('ok set cookie', response.token);
 			// console.log(response);
-			if (response.success) {
+			if (response.data.success) {
 				Message.success('Profile Updated');
 				return dispatch(getUser(token));
 			}
-			Message.error(response.msg);
+			Message.error(response.data.msg);
 			return;
 			// .then(() => Router.push('/dashboard'));
 		})
-		.catch((err) => console.log(err));
+		.catch((err) => {
+			console.log(err);
+			return Message.error(err.response.data.msg);
+		});
+
+	// console.log(user);
 };
 
 export const getUser = (token) => (dispatch) => {
 	if (!token) return null;
-	fetch(`${URL}/api/user`, {
-		method: 'GET',
-		headers: {
-			Authorization: `${token}`,
-		},
-	})
-		.then((res) => res.json())
-		.then((user) => {
-			dispatch({ type: AUTHENTICATE, payload: token });
-			dispatch({ type: USERINFO, payload: user });
+	axios
+		.get(`/api/user`, {
+			headers: {
+				Authorization: `${token}`,
+			},
+		})
+		.then((response) => {
+			dispatch({ type: AUTHENTICATE, payload: response.data.token });
+			dispatch({ type: USERINFO, payload: response.data.user });
 			return { loaded: true };
-		});
+		})
+		.catch((err) => console.log(err.response.data));
 };
 
 export const getUserLocal = async (token) => {
 	// console.log(token);
 	if (!token) return null;
-	const res = await fetch(`${URL}/api/user`, {
-		// const res = await fetch(`https://greenfacilitiesltd-api.now.sh/users/api`, {
-		method: 'GET',
+	const res = await axios.get(`/api/user`, {
 		headers: {
 			Accept: 'application/json',
 			Authorization: `${token}`,
 		},
 	});
-	const user = await res.json();
+	const user = await res.data;
+	// console.log(user);
 	return user;
 };
 

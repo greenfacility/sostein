@@ -39,7 +39,7 @@ class AddData1 extends Component {
 	handleOk = () => {
 		const { validateFields } = this.props.form;
 		// this.setState({ loading: true });
-		if (this.state.picture === '') return Message.error('You have to attach a picture');
+		// if (this.state.picture === '') return Message.error('You have to attach a picture');
 		validateFields((err, values) => {
 			if (!err) {
 				// setTimeout(() => {
@@ -92,11 +92,11 @@ class AddData1 extends Component {
 		return (
 			<div>
 				<Button type="primary" onClick={this.showModal}>
-					Add Request
+					Add WorkOrder
 				</Button>
 				<Modal
 					visible={visible}
-					title="Add Request"
+					title="Add Work Order"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}
 					footer={[

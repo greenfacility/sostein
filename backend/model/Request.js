@@ -17,7 +17,7 @@ export default new mongoose.Schema({
 	},
 	picture: {
 		type: String,
-		required: true,
+		required: false,
 	},
 	description: {
 		type: String,
@@ -36,6 +36,10 @@ export default new mongoose.Schema({
 		default: 0,
 	},
 	assigned: {
+		type: String,
+		default: 'Unassigned',
+	},
+	assignedId: {
 		type: String,
 		default: 'Unassigned',
 	},

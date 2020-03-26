@@ -4,6 +4,7 @@ import ServiceSchema from '../model/Service';
 import LocationSchema from '../model/Location';
 import RequestSchema from '../model/Request';
 import ActivitySchema from '../model/Activity';
+import PropertySchema from '../model/Property';
 
 const uri = require('./keys').MongoURI;
 const option = {
@@ -24,6 +25,7 @@ const connectDb = (handler) => async (req, res) => {
 		conn.model('request', RequestSchema);
 		conn.model('location', LocationSchema);
 		conn.model('activities', ActivitySchema);
+		conn.model('property', PropertySchema);
 	}
 
 	const User = conn.model('user');
@@ -31,7 +33,8 @@ const connectDb = (handler) => async (req, res) => {
 	const Request = conn.model('request');
 	const Location = conn.model('location');
 	const Activity = conn.model('activities');
-	const db = { User, Service, Request, Activity, Location };
+	const Property = conn.model('property');
+	const db = { User, Service, Request, Activity, Location, Property };
 	return handler(req, res, db);
 };
 

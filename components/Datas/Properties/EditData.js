@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Input, Divider, Select, Menu, Row, Message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { editLocation, getLocation } from '../../../redux/actions';
+import { editProperty, getProperty } from '../../../redux/actions';
 import { Edit } from 'react-feather';
 import FormItem from 'antd/lib/form/FormItem';
 import TextArea from 'antd/lib/input/TextArea';
@@ -13,7 +13,7 @@ class EditData extends Component {
 	};
 
 	showModal = (id) => {
-		this.props.getLocation(id);
+		this.props.getProperty(id);
 		this.setState({
 			visible: true,
 		});
@@ -26,7 +26,7 @@ class EditData extends Component {
 			if (!err) {
 				// this.setState({ loading: false, visible: false });
 				Message.warning('Loading...').then(() =>
-					this.props.editLocation(values, this.props.locations.location._id),
+					this.props.editProperty(values, this.props.properties.property._id),
 				);
 			}
 		});
@@ -74,11 +74,11 @@ class EditData extends Component {
 		return (
 			<div>
 				<Button type="primary" onClick={(e) => this.showModal(this.props.id)}>
-					Edit Location
+					Edit Property
 				</Button>
 				<Modal
 					visible={visible}
-					title="Edit Location"
+					title="Edit Property"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}
 					footer={[
@@ -91,28 +91,47 @@ class EditData extends Component {
 					]}
 				>
 					<Form>
-						<FormItem {...formItemLayout} label="State">
-							{getFieldDecorator('state', {
+						<FormItem {...formItemLayout} label="Name">
+							{getFieldDecorator('name', {
 								rules: [
 									{
 										required: true,
-										message: 'Please enter state name',
+										message: 'Please enter property name',
 									},
 								],
-								initialValue: this.props.locations.location.state,
-							})(<Input placeholder="State" />)}
+								initialValue: this.props.properties.property.name,
+							})(<Input placeholder="Name" />)}
 						</FormItem>
 
-						<FormItem {...formItemLayout} label="Area">
-							{getFieldDecorator('area', {
+						<FormItem {...formItemLayout} label="Property">
+							{getFieldDecorator('property', {
 								rules: [
 									{
 										required: true,
-										message: 'Please enter area!',
+										message: 'Please input property!',
 									},
 								],
-								initialValue: this.props.locations.location.area,
-							})(<Input placeholder="Area" />)}
+								initialValue: this.props.properties.property.property,
+							})(<Input placeholder="Property" />)}
+						</FormItem>
+						<FormItem {...formItemLayout} label="Location">
+							{getFieldDecorator('location', {
+								rules: [
+									{
+										required: true,
+										message: 'Please select your location!',
+									},
+								],
+								initialValue: this.props.properties.property.location,
+							})(
+								<Select style={{ width: '100%' }}>
+									{this.props.locations.locations.map((prop) => (
+										<Option key={prop._id} value={`${prop.state}-${prop.area}`}>
+											{`${prop.state}-${prop.area}`}
+										</Option>
+									))}
+								</Select>,
+							)}
 						</FormItem>
 					</Form>
 				</Modal>
@@ -121,4 +140,4 @@ class EditData extends Component {
 	}
 }
 
-export default connect((state) => state, { editLocation, getLocation })(Form.create()(EditData));
+export default connect((state) => state, { editProperty, getProperty })(Form.create()(EditData));

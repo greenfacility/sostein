@@ -12,16 +12,16 @@ const handler = (req, res, db) => {
 	res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, PUT, PATCH, GET, DELETE, POST');
 
 	const method = req.method;
-	const Location = db.Location;
+	const Property = db.Property;
 	switch (method) {
 		case 'GET':
-			Location.findById(req.query.id)
+			Property.findById(req.query.id)
 				.select('-__v')
 				.then((result) => res.status(200).json({ result }))
-				.catch((err) => res.status(500).json({ msg: `Can't get locations ${err}` }));
+				.catch((err) => res.status(500).json({ msg: `Can't get properties ${err}` }));
 			break;
 		case 'DELETE':
-			authCheck(req, res, db).Location
+			authCheck(req, res, db).Property
 				.remove({ _id: req.query.id })
 				.then((result) => res.status(200).json({ success: true, result }))
 				.catch((error) => res.status(500).json({ success: false, error }));
@@ -34,7 +34,7 @@ const handler = (req, res, db) => {
 					final[key] = newData[key];
 				}
 			}
-			authCheck(req, res, db).Location
+			authCheck(req, res, db).Property
 				.update({ _id: req.query.id }, { $set: final })
 				.then((result) => res.status(200).json({ success: true, result }))
 				.catch((error) => res.status(500).json({ success: false, error }));
