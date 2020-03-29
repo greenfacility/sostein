@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Input, Divider, Select, Menu, Row, Message, Upload, Icon } from 'antd';
 import { Edit, User } from 'react-feather';
 import { connect } from 'react-redux';
-import { assignMember, getRequest } from '../../../redux/actions';
+import { assignMember, getRequest, requestOpenAndClose2 } from '../../../redux/actions';
 import React, { Component } from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 
@@ -11,21 +11,19 @@ class AddData1 extends Component {
 	state = {
 		loading: false,
 		visible: false,
-		assigned: '',
+		assigned: this.props.requests.request.assigned,
 	};
 
 	showModal = (id) => {
 		this.props.getRequest(id);
-		this.setState({
-			visible: true,
-		});
+		this.props.requestOpenAndClose2();
 	};
 
 	handleOk = () => {
 		const { validateFields } = this.props.form;
 		validateFields((err, values) => {
 			if (!err) {
-				let data = { name: values.assign.assigned, id: values.assign.assignedId };
+				let data = { name: this.state.assigned, id: values.assign };
 				Message.warning('Loading...').then(() =>
 					this.props.assignMember(data, this.props.requests.request._id, this.props.authentication.user),
 				);
@@ -33,9 +31,7 @@ class AddData1 extends Component {
 		});
 	};
 
-	handleCancel = () => {
-		this.setState({ visible: false });
-	};
+	handleCancel = () => this.props.requestOpenAndClose2();
 
 	handleChange = (e) => {
 		let user = this.props.foruser.users.find((data) => data._id === e);
@@ -53,7 +49,8 @@ class AddData1 extends Component {
 				sm: { span: 16 },
 			},
 		};
-		const { visible, loading } = this.state;
+		// const { visible, loading } = this.state;
+		const { loading, requestopen2 } = this.props.ux;
 		const { getFieldDecorator } = this.props.form;
 		const Option = Select.Option;
 
@@ -64,7 +61,7 @@ class AddData1 extends Component {
 					Assign Member
 				</Button>
 				<Modal
-					visible={visible}
+					visible={requestopen2}
 					title="Assign Member"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}
@@ -104,5 +101,5 @@ class AddData1 extends Component {
 	}
 }
 
-export default connect((state) => state, { assignMember, getRequest })(Form.create()(AddData1));
+export default connect((state) => state, { assignMember, getRequest, requestOpenAndClose2 })(Form.create()(AddData1));
 // export default Form.create()(AddData1);

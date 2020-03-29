@@ -5,21 +5,25 @@ import { Message } from 'antd';
 import fetch from 'isomorphic-unfetch';
 import axios from 'axios';
 import { AUTHENTICATE, DEAUTHENTICATE, REGISTER, USERINFO, AUTH_ERROR } from '../actionTypes';
+import { inProgress, notInProgress } from './uxActions';
 
 export const authenticate = (user) => (dispatch) => {
 	// console.log(user);
+	dispatch(inProgress());
 	axios
 		.post('/api/user', user)
 		.then((response) => {
 			// console.log('ok set cookie', response.status);
 			setCookie('token', response.data.token);
 			Message.success('Sign complete. Taking you to your dashboard!').then(() => Router.push('/dashboard'));
+			dispatch(notInProgress());
 			dispatch({ type: USERINFO, payload: response.data.user });
 			dispatch({ type: AUTHENTICATE, payload: response.data.token });
 		})
 		.catch((err) => {
 			console.log(err.response.data);
 			Message.error(err.response.data.msg);
+			dispatch(notInProgress());
 			return dispatch({ type: AUTH_ERROR, payload: err.response.data.msg });
 		});
 };
@@ -34,12 +38,14 @@ export const deauthenticate = () => {
 
 export const register = (user) => (dispatch) => {
 	// console.log(user);
+	dispatch(inProgress());
 	axios
 		.put('/api/user', user)
 		.then((response) => {
 			// console.log('ok set cookie', response.status);
 			setCookie('token', response.data.token);
 			Message.success('Sign complete. Taking you to your dashboard!').then(() => Router.push('/dashboard'));
+			dispatch(notInProgress());
 			dispatch({ type: USERINFO, payload: response.data.user });
 			dispatch({ type: AUTHENTICATE, payload: response.data.token });
 			dispatch({ type: REGISTER, payload: response.data.token });
@@ -47,12 +53,15 @@ export const register = (user) => (dispatch) => {
 		.catch((err) => {
 			console.log(err.response.data);
 			Message.error(err.response.data.msg);
+			dispatch(notInProgress());
 			return dispatch({ type: AUTH_ERROR, payload: err.response.data.msg });
 		});
 };
 
 export const editProfile = (user, id) => (dispatch) => {
 	const token = getCookie('token');
+
+	dispatch(inProgress());
 
 	axios
 		.patch(`/api/user/${id}`, user, {
@@ -67,14 +76,19 @@ export const editProfile = (user, id) => (dispatch) => {
 			// console.log(response);
 			if (response.data.success) {
 				Message.success('Profile Updated');
+				dispatch(notInProgress());
 				return dispatch(getUser(token));
 			}
 			Message.error(response.data.msg);
+			dispatch(notInProgress());
+
 			return;
 			// .then(() => Router.push('/dashboard'));
 		})
 		.catch((err) => {
 			console.log(err);
+			dispatch(notInProgress());
+
 			return Message.error(err.response.data.msg);
 		});
 

@@ -46,4 +46,15 @@ export const DELETE_PROPERTY = 'DELETE_PROPERTY';
 export const PROPERTY_ERR = 'PROPERTY_ERR';
 
 // UX ACTIONS
-export const REQUESTING = 'REQUESTING';
+export const BTNLOADING = 'BTNLOADING';
+export const LOCATIONOC = 'LOCATIONOC';
+export const PROPERTYOC = 'PROPERTYOC';
+export const REQUESTOC = 'REQUESTOC';
+export const SERVICEOC = 'SERVICEOC';
+export const USEROC = 'USEROC';
+export const LOCATIONOC2 = 'LOCATIONOC2';
+export const PROPERTYOC2 = 'PROPERTYOC2';
+export const REQUESTOC2 = 'REQUESTOC2';
+export const REQUESTOC3 = 'REQUESTOC3';
+export const SERVICEOC2 = 'SERVICEOC2';
+export const USEROC2 = 'USEROC2';

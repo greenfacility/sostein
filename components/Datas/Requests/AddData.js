@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Input, Divider, Select, Menu, Row, Message, Upload, Icon } from 'antd';
 import { Edit, User } from 'react-feather';
 import { connect } from 'react-redux';
-import { addRequest } from '../../../redux/actions';
+import { addRequest, requestOpenAndClose } from '../../../redux/actions';
 import React, { Component } from 'react';
 import ImageUploader from '../../../lib/uploading';
 import TextArea from 'antd/lib/input/TextArea';
@@ -14,28 +14,20 @@ class AddData1 extends Component {
 		loading: false,
 		visible: false,
 		picture: '',
+		property: '',
+		from: '',
 	};
 
-	showModal = () => {
+	showModal = () => this.props.requestOpenAndClose();
+
+	handleChange = (e) => {
+		let property = this.props.properties.properties.find((data) => data._id === e);
 		this.setState({
-			visible: true,
+			property: `${property.property} - ${property.location} by ${property.name}`,
+			from: property.ownId,
 		});
 	};
 
-	// handleUpload = (info) => {
-	// 	const { status } = info.file;
-	// 	if (status !== 'uploading') {
-	// 		// console.log(info.file, info.fileList);
-	// 		// this.setState({ picture: info.file.response.url });
-	// 		console.log(info);
-	// 		return info.file.response.url;
-	// 	}
-	// 	if (status === 'done') {
-	// 		message.success(`${info.file.name} file uploaded successfully.`);
-	// 	} else if (status === 'error') {
-	// 		message.error(`${info.file.name} file upload failed.`);
-	// 	}
-	// };
 	handleOk = () => {
 		const { validateFields } = this.props.form;
 		// this.setState({ loading: true });
@@ -46,15 +38,15 @@ class AddData1 extends Component {
 				// 	this.setState({ loading: false, visible: false });
 				// }, 3000);
 				values.picture = this.state.picture;
+				values.property = this.state.property;
+				values.from = this.state.from;
 				// console.log(values);
 				Message.warning('Loading...').then(() => this.props.addRequest(values, this.props.authentication.user));
 			}
 		});
 	};
 
-	handleCancel = () => {
-		this.setState({ visible: false });
-	};
+	handleCancel = () => this.props.requestOpenAndClose();
 
 	uploadRemove = (data) => {
 		// console.log(data);
@@ -77,10 +69,10 @@ class AddData1 extends Component {
 				sm: { span: 16 },
 			},
 		};
-		const { visible, loading } = this.state;
+		// const { visible, loading } = this.state;
 		const { getFieldDecorator } = this.props.form;
 		const Option = Select.Option;
-
+		const { loading, requestopen } = this.props.ux;
 		// const prefixSelector = getFieldDecorator('prefix', {
 		// 	initialValue: '+234',
 		// })(
@@ -95,7 +87,7 @@ class AddData1 extends Component {
 					Add WorkOrder
 				</Button>
 				<Modal
-					visible={visible}
+					visible={requestopen}
 					title="Add Work Order"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}
@@ -138,6 +130,24 @@ class AddData1 extends Component {
 								</Select>,
 							)}
 						</FormItem>
+						<FormItem {...formItemLayout} label="Property">
+							{getFieldDecorator('propertyId', {
+								rules: [
+									{
+										required: true,
+										message: 'Please select property!',
+									},
+								],
+							})(
+								<Select style={{ width: '100%' }} onChange={this.handleChange}>
+									{this.props.properties.properties.map((data) => (
+										<Option key={data._id} value={data._id}>
+											{data.property} - {data.location} by {data.name}
+										</Option>
+									))}
+								</Select>,
+							)}
+						</FormItem>
 						<FormItem label={'Desciption'}>
 							{getFieldDecorator('description', {
 								rules: [
@@ -158,18 +168,7 @@ class AddData1 extends Component {
 						<FormItem label="Picture">
 							{getFieldDecorator('picture', {
 								rules: [ { required: false, message: 'Please Upload your Profile Picture!' } ],
-							})(
-								// // <Dragger onChange={this.handleUpload} {...props}>
-								// <div>
-								// 	<p className="ant-upload-drag-icon">
-								// 		<Icon type="inbox" />
-								// 	</p>
-								// 	<p className="ant-upload-text">Click or drag file to this area to upload</p>
-								// 	<p className="ant-upload-hint">Upload your profile picture to the database</p>
-								// </div>,
-								// // </Dragger>,
-								<ImageUploader uploadResponse={this.uploadResponse} uploadRemove={this.uploadRemove} />,
-							)}
+							})(<ImageUploader uploadResponse={this.uploadResponse} uploadRemove={this.uploadRemove} />)}
 						</FormItem>
 					</Form>
 				</Modal>
@@ -178,5 +177,5 @@ class AddData1 extends Component {
 	}
 }
 
-export default connect((state) => state, { addRequest })(Form.create()(AddData1));
+export default connect((state) => state, { addRequest, requestOpenAndClose })(Form.create()(AddData1));
 // export default Form.create()(AddData1);

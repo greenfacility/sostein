@@ -1,8 +1,11 @@
 import '../assets/styles.less';
 
 // import App from 'next/app';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import redirect from 'next-redirect';
+
+import LoadingOverlay from 'react-loading-overlay';
+import BounceLoader from 'react-spinners/HashLoader';
 
 import AppProvider from '../components/shared/AppProvider';
 import { Provider } from 'react-redux';
@@ -29,21 +32,11 @@ Router.events.on('routeChangeStart', () => NProgress.start());
 Router.events.on('routeChangeComplete', () => NProgress.done());
 Router.events.on('routeChangeError', () => NProgress.done());
 
-// class MyApp extends App {
-
-// componentDidUpdate() {
-// 	if (this.props.user.userType === 'admin' && Router.pathname === '/data') {
-// 		Router.push('/dashboard');
-// 	}
-// }
-// componentDidMount() {
-// 	if (this.props.user.userType === 'admin' && Router.pathname === '/data') {
-// 		Router.push('/dashboard');
-// 	}
-// }
-
-// render() {
 const MyApp = ({ Component, pageProps, store }) => {
+	const [ active, setActive ] = useState(false);
+	Router.events.on('routeChangeStart', () => setActive(true));
+	Router.events.on('routeChangeComplete', () => setActive(false));
+	Router.events.on('routeChangeError', () => setActive(false));
 	return (
 		<Fragment>
 			<Provider store={store}>
@@ -65,9 +58,11 @@ const MyApp = ({ Component, pageProps, store }) => {
 					)}
 				</Head>
 				<AppProvider>
-					<Page>
-						<Component {...pageProps} />
-					</Page>
+					<LoadingOverlay active={active} spinner={<BounceLoader color={'#ffffff'} />}>
+						<Page>
+							<Component {...pageProps} />
+						</Page>
+					</LoadingOverlay>
 				</AppProvider>
 			</Provider>
 		</Fragment>
@@ -107,26 +102,14 @@ MyApp.getInitialProps = async ({ Component, ctx }) => {
 		const services = await getServicesLocal();
 		var requests = await getRequestLocal(user);
 		const locations = await getLocationLocal();
-		const properties = await getPropertyLocal();
-		// console.log(dates);
-		// if (user.usertype !== 'manager') {
-		// 	if(user.usertype !== 'admin'){
-		// 		requests.filter((result) => result.by_id === user._id);
-		// 	}
-		// 		requests.filter((result) => result.by_id === user._id);
+		const properties = await getPropertyLocal(user);
 
-		// }
-
-		// console.log(requests);
 		if (user.usertype === 'manager') {
 			var users = await getUsersLocal(token);
 			ctx.store.dispatch({ type: 'USERSINFO', payload: users });
-		} else if (user.usertype === 'team-member') {
-			await requests.filter((result) => result.by_id === user._id || result.assign_id === user._id);
-		} else {
-			await requests.filter((result) => result.by_id === user._id);
+			// userRequest = await requests;
 		}
-		// console.log(requests);
+		// console.log(user._id, requests);
 		ctx.store.dispatch({ type: 'GET_REQUESTS', payload: requests });
 		ctx.store.dispatch({ type: 'GET_SERVICES', payload: services });
 		ctx.store.dispatch({ type: 'GET_LOCATIONS', payload: locations });

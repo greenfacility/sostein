@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Input, Divider, Select, Menu, Row, Message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { editUser, getEditUser } from '../../../redux/actions';
+import { editUser, getEditUser, userOpenAndClose2 } from '../../../redux/actions';
 import { Edit, Eye } from 'react-feather';
 import FormItem from 'antd/lib/form/FormItem';
 import TextArea from 'antd/lib/input/TextArea';
@@ -16,9 +16,7 @@ class EditData extends Component {
 
 	showModal = (id) => {
 		this.props.getEditUser(id);
-		this.setState({
-			visible: true,
-		});
+		this.props.userOpenAndClose2();
 	};
 
 	makeEnabled = () => {
@@ -38,9 +36,7 @@ class EditData extends Component {
 		});
 	};
 
-	handleCancel = () => {
-		this.setState({ visible: false });
-	};
+	handleCancel = () => this.props.userOpenAndClose2();
 
 	componentDidMount() {
 		const { usertype } = this.props.authentication.user;
@@ -76,7 +72,8 @@ class EditData extends Component {
 		// 	},
 		// };
 
-		var { visible, loading, status } = this.state;
+		var { status } = this.state;
+		const { loading, useropen2 } = this.props.ux;
 		const { getFieldDecorator, getFieldValue } = this.props.form;
 		const { usertype } = this.props.authentication.user;
 		const { _id, firstname, lastname, email, phonenumber, picture, about, address } = this.props.foruser.edit;
@@ -96,7 +93,7 @@ class EditData extends Component {
 					Edit User
 				</Button>
 				<Modal
-					visible={visible}
+					visible={useropen2}
 					title="Change User Info"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}
@@ -258,4 +255,4 @@ class EditData extends Component {
 	}
 }
 
-export default connect((state) => state, { editUser, getEditUser })(Form.create()(EditData));
+export default connect((state) => state, { editUser, getEditUser, userOpenAndClose2 })(Form.create()(EditData));

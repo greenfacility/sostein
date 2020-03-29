@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Input, Divider, Select, Menu, Row, Message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { changeRequestStatus, getRequest } from '../../../redux/actions';
+import { changeRequestStatus, getRequest, requestOpenAndClose3 } from '../../../redux/actions';
 import { Edit, User } from 'react-feather';
 import FormItem from 'antd/lib/form/FormItem';
 import TextArea from 'antd/lib/input/TextArea';
@@ -15,9 +15,7 @@ class EditData extends Component {
 
 	showModal = (id) => {
 		this.props.getRequest(id);
-		this.setState({
-			visible: true,
-		});
+		this.props.requestOpenAndClose3();
 	};
 
 	handleOk = () => {
@@ -37,9 +35,7 @@ class EditData extends Component {
 		});
 	};
 
-	handleCancel = () => {
-		this.setState({ visible: false });
-	};
+	handleCancel = () => this.props.requestOpenAndClose3();
 
 	render() {
 		// console.log(this.props);
@@ -65,7 +61,8 @@ class EditData extends Component {
 		// 		},
 		// 	},
 		// };
-		var { visible, loading, status } = this.state;
+		var { status } = this.state;
+		const { loading, requestopen3 } = this.props.ux;
 		const { getFieldDecorator } = this.props.form;
 		const { usertype } = this.props.authentication.user;
 		var statuses = status;
@@ -91,14 +88,13 @@ class EditData extends Component {
 		// );
 		return (
 			<div>
-				{usertype !== 'user' ||
-					(usertype !== 'team-member' && (
-						<Button type="primary" onClick={(e) => this.showModal(this.props.id)}>
-							Change Status
-						</Button>
-					))}
+				{(usertype !== 'user' || usertype !== 'team-member') && (
+					<Button type="primary" onClick={(e) => this.showModal(this.props.id)}>
+						Change Status
+					</Button>
+				)}
 				<Modal
-					visible={visible}
+					visible={requestopen3}
 					title="Change Status"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}
@@ -135,6 +131,18 @@ class EditData extends Component {
 								],
 								initialValue: this.props.requests.request.type,
 							})(<Input placeholder="Request Type" disabled />)}
+						</FormItem>
+
+						<FormItem {...formItemLayout} label="Property">
+							{getFieldDecorator('propertyId', {
+								rules: [
+									{
+										required: true,
+										message: 'Please select property!',
+									},
+								],
+								initialValue: this.props.requests.request.property,
+							})(<Input placeholder="Property" disabled />)}
 						</FormItem>
 						<FormItem {...formItemLayout} label="Status">
 							{getFieldDecorator('status', {
@@ -180,4 +188,6 @@ class EditData extends Component {
 	}
 }
 
-export default connect((state) => state, { changeRequestStatus, getRequest })(Form.create()(EditData));
+export default connect((state) => state, { changeRequestStatus, getRequest, requestOpenAndClose3 })(
+	Form.create()(EditData),
+);

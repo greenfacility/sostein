@@ -13,4 +13,8 @@ export default new mongoose.Schema({
 		type: String,
 		required: true,
 	},
+	ownId: {
+		type: String,
+		required: true,
+	},
 });

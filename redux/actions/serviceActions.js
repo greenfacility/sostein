@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Message } from 'antd';
 import { SERVICE_ERR, ADD_SERVICE, DELETE_SERVICE, EDIT_SERVICE, GET_SERVICES, GET_SERVICE } from '../actionTypes';
 import { getCookie } from './authActions';
+import { serviceOpenAndClose, serviceOpenAndClose2, inProgress, notInProgress } from './uxActions';
 
 export const getServices = () => (dispatch) => {
 	axios
@@ -50,18 +51,22 @@ export const getServicesLocal = async () => {
 };
 
 export const getService = (id) => (dispatch) => {
+	dispatch(inProgress());
 	axios
 		.get(`/api/service/${id}`)
 		.then((response) => {
 			if (response.data.msg) {
 				Message.error(response.data.msg);
+				dispatch(notInProgress());
 				return dispatch({ type: SERVICE_ERR, payload: response.data.msg });
 			}
 			// Message.success('Sign complete. Taking you to your dashboard!').then(() => Router.push('/dashboard'));
 			dispatch({ type: GET_SERVICE, payload: response.result });
+			dispatch(notInProgress());
 		})
 		.catch((err) => {
 			console.log(err.response);
+			dispatch(notInProgress());
 			if (err.response.data.msg) {
 				Message.error(err.response.data.msg);
 				return dispatch({ type: SERVICE_ERR, payload: err.response.data.msg });
@@ -95,6 +100,7 @@ export const deleteService = (id) => (dispatch) => {
 
 export const addService = (body) => (dispatch) => {
 	const token = getCookie('token');
+	dispatch(inProgress());
 	// console.log(token, body);
 	axios
 		.post(`/api/service`, body, {
@@ -108,20 +114,25 @@ export const addService = (body) => (dispatch) => {
 			if (result.data.success) {
 				Message.success('Service is added successfully');
 				// dispatch({ type: ADD_SERVICE, payload: result.data });
+				dispatch(serviceOpenAndClose());
+				dispatch(notInProgress());
 				return dispatch(getServices());
 			}
 			// console.log(result);
 			Message.error('Error while adding service');
+			dispatch(notInProgress());
 		})
 		.catch((err) => {
 			// console.log(err);
 			Message.error('Unable to add this service');
+			dispatch(notInProgress());
 			return console.log(err.response);
 		});
 };
 
 export const editService = (body, id) => (dispatch) => {
 	const token = getCookie('token');
+	dispatch(inProgress());
 	axios
 		.patch(`/api/service/${id}`, body, {
 			headers: {
@@ -134,13 +145,17 @@ export const editService = (body, id) => (dispatch) => {
 			if (result.data.success) {
 				Message.success('Service status is changed successfully');
 				dispatch({ type: EDIT_SERVICE, payload: {} });
+				dispatch(serviceOpenAndClose2());
+				dispatch(notInProgress());
 				return dispatch(getServices());
 			}
 			// console.log(result);
 			Message.error('Error while updating the service');
+			dispatch(notInProgress());
 		})
 		.catch((err) => {
 			Message.error('Unable to change this service status');
+			dispatch(notInProgress());
 			return console.log(err.response);
 		});
 };

@@ -22,7 +22,7 @@ const handler = (req, res, db) => {
 			break;
 		// Create new Property
 		case 'POST':
-			var { name, property, location } = req.body;
+			var { name, property, location, ownId } = req.body;
 			authCheck(req, res, db).Property
 				.find({ name, property })
 				.then((result) => {
@@ -33,6 +33,7 @@ const handler = (req, res, db) => {
 						name,
 						property,
 						location,
+						ownId,
 					});
 
 					newProperty.save().then((data) => res.json({ success: true, data }));

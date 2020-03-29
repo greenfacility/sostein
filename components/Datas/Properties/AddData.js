@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Input, Divider, Select, Menu, Row, Message } from 'antd';
 import { Edit } from 'react-feather';
 import { connect } from 'react-redux';
-import { addProperty } from '../../../redux/actions';
+import { addProperty, propertyOpenAndClose } from '../../../redux/actions';
 import React, { Component } from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 
@@ -9,29 +9,40 @@ class AddData1 extends Component {
 	state = {
 		loading: false,
 		visible: false,
+		name: '',
 	};
 
-	showModal = () => {
-		this.setState({
-			visible: true,
-		});
-	};
+	showModal = () => this.props.propertyOpenAndClose();
 
 	handleOk = () => {
 		const { validateFields } = this.props.form;
 		// this.setState({ loading: true });
+		const loggedUser = this.props.authentication.user;
+		let tempName = `${loggedUser.firstname} ${loggedUser.lastname}`;
 		validateFields((err, values) => {
 			if (!err) {
+				if (loggedUser.usertype == 'user') {
+					values.name = tempName;
+					values.ownId = loggedUser._id;
+				} else {
+					values.name = this.state.name;
+				}
 				// setTimeout(() => {
 				// 	this.setState({ loading: false, visible: false });
 				// }, 3000);
-				Message.warning('Loading...').then(() => this.props.addProperty(values));
+				console.log(values);
+				Message.warning('Loading...').then(() =>
+					this.props.addProperty(values, this.props.authentication.user),
+				);
 			}
 		});
 	};
 
-	handleCancel = () => {
-		this.setState({ visible: false });
+	handleCancel = () => this.props.propertyOpenAndClose();
+
+	handleChange = (e) => {
+		let user = this.props.foruser.users.find((data) => data._id === e);
+		this.setState({ name: `${user.firstname} ${user.lastname}` });
 	};
 
 	render() {
@@ -57,8 +68,9 @@ class AddData1 extends Component {
 				},
 			},
 		};
-		const { visible, loading } = this.state;
+		// const { visible, loading } = this.state;
 		const { getFieldDecorator } = this.props.form;
+		const { loading, propertyopen } = this.props.ux;
 		// const Option = Select.Option;
 
 		// const prefixSelector = getFieldDecorator('prefix', {
@@ -69,13 +81,25 @@ class AddData1 extends Component {
 		// 	</Select>,
 		// );
 
+		let users = this.props.foruser.users;
+		const loggedUser = this.props.authentication.user;
+		let tempName = `${loggedUser.firstname} ${loggedUser.lastname}`;
+		let ready = true;
+		if (loggedUser.usertype === 'manager' || loggedUser.usertype === 'team-member') {
+			tempName = `Please select name`;
+			ready = false;
+		} else {
+			tempName = `${loggedUser.firstname} ${loggedUser.lastname}`;
+			ready = true;
+		}
+
 		return (
 			<div>
 				<Button type="primary" onClick={this.showModal}>
 					New Property
 				</Button>
 				<Modal
-					visible={visible}
+					visible={propertyopen}
 					title="New Property"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}
@@ -90,14 +114,23 @@ class AddData1 extends Component {
 				>
 					<Form>
 						<FormItem {...formItemLayout} label="Name">
-							{getFieldDecorator('name', {
+							{getFieldDecorator('ownId', {
 								rules: [
 									{
 										required: true,
-										message: 'Please enter name',
+										message: 'Please select name!',
 									},
 								],
-							})(<Input placeholder="Name" />)}
+								initialValue: tempName,
+							})(
+								<Select style={{ width: '100%' }} disabled={ready} onChange={this.handleChange}>
+									{users.map((prop) => (
+										<Option key={prop._id} value={prop._id}>
+											{`${prop.firstname} ${prop.lastname}`}
+										</Option>
+									))}
+								</Select>,
+							)}
 						</FormItem>
 
 						<FormItem {...formItemLayout} label="Property">
@@ -136,5 +169,5 @@ class AddData1 extends Component {
 	}
 }
 
-export default connect((state) => state, { addProperty })(Form.create()(AddData1));
+export default connect((state) => state, { addProperty, propertyOpenAndClose })(Form.create()(AddData1));
 // export default Form.create()(AddData1);

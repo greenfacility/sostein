@@ -88,11 +88,25 @@ class RequestTable extends Component {
 				...this.getColumnSearchProps('date'),
 			},
 			{
+				title: 'Lifetime',
+				dataIndex: 'lifetime',
+				key: 'lifetime',
+				width: '20%',
+				...this.getColumnSearchProps('lifetime'),
+			},
+			{
 				title: 'Type',
 				dataIndex: 'type',
 				key: 'type',
 				width: '20%',
 				...this.getColumnSearchProps('type'),
+			},
+			{
+				title: 'Property',
+				dataIndex: 'property',
+				key: 'property',
+				width: '20%',
+				...this.getColumnSearchProps('property'),
 			},
 			{
 				title: 'From',
@@ -126,7 +140,7 @@ class RequestTable extends Component {
 			{
 				title: 'Action',
 				key: 'action',
-				width: '10%',
+				width: '5%',
 				render: (text, record) => {
 					// console.log(record);
 					return (
@@ -134,8 +148,8 @@ class RequestTable extends Component {
 							overlay={
 								<Menu>
 									<EditData id={record._id} />
-									<AssignMember id={record._id} />
-									{usertype !== 'user' && (
+									{usertype === 'manager' && <AssignMember id={record._id} />}
+									{usertype === 'manager' && (
 										<Menu.Item
 											onClick={(e) =>
 												this.props.deleteRequest(record._id, this.props.authentication.user)}
@@ -159,6 +173,7 @@ class RequestTable extends Component {
 		var data = columns;
 		// console.log(data);
 		if (usertype !== 'manager') {
+			data = data.filter((cols) => cols.key !== 'assigned');
 			if (usertype !== 'team-member') {
 				// data = columns.filter((cols) => cols.key !== 'action');
 				data = data.filter((cols) => cols.key !== 'from');
@@ -173,6 +188,7 @@ class RequestTable extends Component {
 		var holdReq = requests.filter((dt) => dt.status === 'hold');
 		var parkReq = requests.filter((dt) => dt.status === 'pack');
 		var doneReq = requests.filter((dt) => dt.status === 'done');
+		// console.log(pendingReq);
 
 		return (
 			<Card title="Work Order Lists" style={{ padding: '0 !important', overflow: 'auto' }} extra={<AddData />}>
@@ -185,16 +201,16 @@ class RequestTable extends Component {
 					className="border-bottom-0"
 				>
 					<Menu.Item key="1">Pending</Menu.Item>
-					<Menu.Item key="2">On-going</Menu.Item>
+					<Menu.Item key="2">Done</Menu.Item>
 					<Menu.Item key="3">Pack</Menu.Item>
 					<Menu.Item key="4">Hold</Menu.Item>
-					<Menu.Item key="5">Done</Menu.Item>
+					<Menu.Item key="5">On-going</Menu.Item>
 				</Menu>
 				{this.state.activeTab === '1' && <Table columns={data} dataSource={pendingReq} />}
-				{this.state.activeTab === '2' && <Table columns={data} dataSource={ongoingReq} />}
+				{this.state.activeTab === '2' && <Table columns={data} dataSource={doneReq} />}
 				{this.state.activeTab === '3' && <Table columns={data} dataSource={parkReq} />}
 				{this.state.activeTab === '4' && <Table columns={data} dataSource={holdReq} />}
-				{this.state.activeTab === '5' && <Table columns={data} dataSource={doneReq} />}
+				{this.state.activeTab === '5' && <Table columns={data} dataSource={ongoingReq} />}
 			</Card>
 		);
 	}

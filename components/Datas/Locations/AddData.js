@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Input, Divider, Select, Menu, Row, Message } from 'antd';
 import { Edit } from 'react-feather';
 import { connect } from 'react-redux';
-import { addLocation } from '../../../redux/actions';
+import { addLocation, locationOpenAndClose } from '../../../redux/actions';
 import React, { Component } from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 
@@ -11,11 +11,7 @@ class AddData1 extends Component {
 		visible: false,
 	};
 
-	showModal = () => {
-		this.setState({
-			visible: true,
-		});
-	};
+	showModal = () => this.props.locationOpenAndClose();
 
 	handleOk = () => {
 		const { validateFields } = this.props.form;
@@ -30,9 +26,7 @@ class AddData1 extends Component {
 		});
 	};
 
-	handleCancel = () => {
-		this.setState({ visible: false });
-	};
+	handleCancel = () => this.props.locationOpenAndClose();
 
 	render() {
 		const formItemLayout = {
@@ -57,8 +51,9 @@ class AddData1 extends Component {
 				},
 			},
 		};
-		const { visible, loading } = this.state;
+		const { visible } = this.state;
 		const { getFieldDecorator } = this.props.form;
+		const { loading, locationopen } = this.props.ux;
 		// const Option = Select.Option;
 
 		// const prefixSelector = getFieldDecorator('prefix', {
@@ -75,7 +70,7 @@ class AddData1 extends Component {
 					Add Location
 				</Button>
 				<Modal
-					visible={visible}
+					visible={locationopen}
 					title="Add Location"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}
@@ -117,5 +112,5 @@ class AddData1 extends Component {
 	}
 }
 
-export default connect((state) => state, { addLocation })(Form.create()(AddData1));
+export default connect((state) => state, { addLocation, locationOpenAndClose })(Form.create()(AddData1));
 // export default Form.create()(AddData1);

@@ -22,7 +22,7 @@ const handler = (req, res, db) => {
 			break;
 		case 'DELETE':
 			authCheck(req, res, db).Property
-				.remove({ _id: req.query.id })
+				.deleteOne({ _id: req.query.id })
 				.then((result) => res.status(200).json({ success: true, result }))
 				.catch((error) => res.status(500).json({ success: false, error }));
 			break;

@@ -4,12 +4,12 @@ import cookie from 'react-cookies';
 import Router from 'next/router';
 import { Message } from 'antd';
 import axios from 'axios';
-import { btnLoading } from './uxActions';
+import { inProgress, notInProgress, userOpenAndClose, userOpenAndClose2 } from './uxActions';
 import { USER_ERROR, EDITUSERINFO, USERSINFO } from '../actionTypes';
 
 export const createUser = (user) => (dispatch) => {
 	// console.log(user);
-	dispatch(btnLoading());
+	dispatch(inProgress());
 	axios
 		.put(`/api/user`, user, {
 			headers: {
@@ -22,22 +22,23 @@ export const createUser = (user) => (dispatch) => {
 			// console.log(response);
 			if (!response.data.token) {
 				Message.error(response.data.msg);
-				dispatch(btnLoading());
+				dispatch(notInProgress());
 				return dispatch({ type: USER_ERROR, payload: response.data.msg });
 			}
 			setCookie('token', response.data.token);
 			Message.success('User Created Successfully!');
-			dispatch(btnLoading());
+			dispatch(notInProgress());
+			dispatch(userOpenAndClose());
 			return dispatch(getUsers());
 		})
 		.catch((err) => {
-			dispatch(btnLoading());
+			dispatch(notInProgress());
 			console.log(err.response);
 		});
 };
 
 export const editUser = (user, id) => (dispatch) => {
-	dispatch(btnLoading());
+	dispatch(inProgress());
 	const token = getCookie('token');
 	// console.log(user, id);
 	axios
@@ -53,33 +54,38 @@ export const editUser = (user, id) => (dispatch) => {
 			// console.log(response);
 			if (response.data.success) {
 				Message.success('Profile Updated');
-				dispatch(btnLoading());
+				dispatch(notInProgress());
+				dispatch(userOpenAndClose2());
 				return dispatch(getUsers());
 			}
-			dispatch(btnLoading());
+			dispatch(notInProgress());
 			Message.error(response.data.msg);
 			return;
 			// .then(() => Router.push('/dashboard'));
 		})
 		.catch((err) => {
-			dispatch(btnLoading());
+			dispatch(notInProgress());
 			console.log(err.response);
 		});
 };
 
 export const getEditUser = (id) => (dispatch) => {
 	// const token = getCookie('token');
+	dispatch(inProgress());
 	axios
 		.get(`/api/users/${id}`)
 		.then((response) => {
 			if (response.data.success) {
+				dispatch(notInProgress());
 				return dispatch({ type: EDITUSERINFO, payload: response.data.result });
 			}
 			Message.error(response.data.msg);
+			dispatch(notInProgress());
 		})
 		.catch((err) => {
 			console.log(err.response);
 			Message.error(err.response.data.msg);
+			dispatch(notInProgress());
 		});
 };
 
@@ -133,7 +139,7 @@ export const getUsersLocal = async (token) => {
 };
 
 export const deleteUser = (id) => (dispatch) => {
-	dispatch(btnLoading());
+	dispatch(inProgress());
 	const token = getCookie('token');
 	axios
 		.delete(`/api/user/${id}`, {
@@ -146,14 +152,14 @@ export const deleteUser = (id) => (dispatch) => {
 		.then((result) => {
 			if (result.data.success) {
 				Message.success('User is deleted successfully');
-				dispatch(btnLoading());
+				dispatch(notInProgress());
 				return dispatch(getUsers());
 			}
-			dispatch(btnLoading());
+			dispatch(notInProgress());
 			Message.error('Error while deleting the user');
 		})
 		.catch((err) => {
-			dispatch(btnLoading());
+			dispatch(notInProgress());
 			Message.error('Unable to delete this user');
 			return console.log(err.response);
 		});

@@ -64,6 +64,7 @@ class PropertyTable extends Component {
 	};
 
 	render() {
+		const { usertype } = this.props.authentication.user;
 		const columns = [
 			{
 				title: 'Name',
@@ -97,12 +98,14 @@ class PropertyTable extends Component {
 							overlay={
 								<Menu>
 									<EditData id={record._id} />
-									<Menu.Item onClick={(e) => this.props.deleteProperty(record._id)}>
-										<Row type="flex" align="middle">
-											{' '}
-											<span>Delete</span>
-										</Row>
-									</Menu.Item>
+									{usertype === 'manager' && (
+										<Menu.Item onClick={(e) => this.props.deleteProperty(record._id)}>
+											<Row type="flex" align="middle">
+												{' '}
+												<span>Delete</span>
+											</Row>
+										</Menu.Item>
+									)}
 								</Menu>
 							}
 						>

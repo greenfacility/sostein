@@ -132,9 +132,17 @@ class ServiceTable extends Component {
 				},
 			},
 		];
+		let col = columns;
+		if (this.props.authentication.user.usertype !== 'manager') {
+			col = columns.filter((dt) => dt.key !== 'action');
+		}
 		return (
-			<Card title="Services" style={{ padding: '0 !important', overflow: 'auto' }} extra={<AddData />}>
-				<Table columns={columns} dataSource={this.props.services.services} />
+			<Card
+				title="Services"
+				style={{ padding: '0 !important', overflow: 'auto' }}
+				extra={this.props.authentication.user.usertype === 'manager' && <AddData />}
+			>
+				<Table columns={col} dataSource={this.props.services.services} />
 			</Card>
 		);
 	}

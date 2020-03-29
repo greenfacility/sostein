@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Input, Divider, Select, Menu, Row, Message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { editProperty, getProperty } from '../../../redux/actions';
+import { editProperty, getProperty, propertyOpenAndClose2 } from '../../../redux/actions';
 import { Edit } from 'react-feather';
 import FormItem from 'antd/lib/form/FormItem';
 import TextArea from 'antd/lib/input/TextArea';
@@ -10,13 +10,12 @@ class EditData extends Component {
 	state = {
 		loading: false,
 		visible: false,
+		name: this.props.properties.property.name,
 	};
 
 	showModal = (id) => {
 		this.props.getProperty(id);
-		this.setState({
-			visible: true,
-		});
+		this.props.propertyOpenAndClose2();
 	};
 
 	handleOk = () => {
@@ -25,15 +24,20 @@ class EditData extends Component {
 		validateFields((err, values) => {
 			if (!err) {
 				// this.setState({ loading: false, visible: false });
+				values.name = this.state.name;
+
 				Message.warning('Loading...').then(() =>
-					this.props.editProperty(values, this.props.properties.property._id),
+					this.props.editProperty(values, this.props.properties.property._id, this.props.authentication.user),
 				);
 			}
 		});
 	};
 
-	handleCancel = () => {
-		this.setState({ visible: false });
+	handleCancel = () => this.props.propertyOpenAndClose2();
+
+	handleChange = (e) => {
+		let user = this.props.foruser.users.find((data) => data._id === e);
+		this.setState({ name: `${user.firstname} ${user.lastname}` });
 	};
 
 	render() {
@@ -60,24 +64,28 @@ class EditData extends Component {
 		// 		},
 		// 	},
 		// };
-		const { visible, loading } = this.state;
+		// const { visible, loading } = this.state;
 		const { getFieldDecorator } = this.props.form;
-		// const Option = Select.Option;
+		const { loading, propertyopen2 } = this.props.ux;
 
-		// const prefixSelector = getFieldDecorator('prefix', {
-		// 	initialValue: '+234',
-		// })(
-		// 	<Select style={{ width: 'auto' }}>
-		// 		<Option value="+234">+234</Option>
-		// 	</Select>,
-		// );
+		let users = this.props.foruser.users;
+		const loggedUser = this.props.authentication.user;
+		let tempName = `${loggedUser.firstname} ${loggedUser.lastname}`;
+		let ready = true;
+		if (loggedUser.usertype === 'manager' || loggedUser.usertype === 'team-member') {
+			tempName = `Please select name`;
+			ready = false;
+		} else {
+			tempName = `${loggedUser.firstname} ${loggedUser.lastname}`;
+			ready = true;
+		}
 		return (
 			<div>
 				<Button type="primary" onClick={(e) => this.showModal(this.props.id)}>
 					Edit Property
 				</Button>
 				<Modal
-					visible={visible}
+					visible={propertyopen2}
 					title="Edit Property"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}
@@ -92,15 +100,23 @@ class EditData extends Component {
 				>
 					<Form>
 						<FormItem {...formItemLayout} label="Name">
-							{getFieldDecorator('name', {
+							{getFieldDecorator('ownId', {
 								rules: [
 									{
 										required: true,
-										message: 'Please enter property name',
+										message: 'Please select name!',
 									},
 								],
 								initialValue: this.props.properties.property.name,
-							})(<Input placeholder="Name" />)}
+							})(
+								<Select style={{ width: '100%' }} disabled={ready} onChange={this.handleChange}>
+									{users.map((prop) => (
+										<Option key={prop._id} value={prop._id}>
+											{`${prop.firstname} ${prop.lastname}`}
+										</Option>
+									))}
+								</Select>,
+							)}
 						</FormItem>
 
 						<FormItem {...formItemLayout} label="Property">
@@ -140,4 +156,4 @@ class EditData extends Component {
 	}
 }
 
-export default connect((state) => state, { editProperty, getProperty })(Form.create()(EditData));
+export default connect((state) => state, { editProperty, getProperty, propertyOpenAndClose2 })(Form.create()(EditData));

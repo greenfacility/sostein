@@ -14,8 +14,16 @@ import {
 	REQUEST_ERR,
 } from '../actionTypes';
 import { getCookie } from './authActions';
+import {
+	inProgress,
+	notInProgress,
+	requestOpenAndClose,
+	requestOpenAndClose2,
+	requestOpenAndClose3,
+} from './uxActions';
 
 export const getRequests = (user) => (dispatch) => {
+	dispatch(inProgress());
 	axios
 		.get(`/api/request`)
 		.then((response) => {
@@ -36,28 +44,61 @@ export const getRequests = (user) => (dispatch) => {
 						assignedId: data.assignedId,
 						description: data.description,
 						timestart: data.timestart,
+						property: data.property,
+						propertyId: data.propertyId,
 						date: date.toDateString(),
 						timecompleted: data.timecompleted,
 					};
 					// data.key = data._id;
 					return dt;
 				});
-				let solution = final;
-				if (user.usertype !== 'manager') {
-					if (user.usertype !== 'admin') {
-						solution = final.filter((dt) => dt.by_id === user._id);
+				let solution = final.filter((data) => {
+					var lifetime;
+					var lifedays;
+					var lifehour;
+					var final;
+					var start = new Date(data.timestart);
+					if (data.status == 'done') {
+						var finish = new Date(data.timecompleted);
+						lifehour = finish.getHours() - start.getHours();
+						lifetime = finish.getTime() - start.getTime();
+						lifedays = lifetime / (1000 * 3600 * 24);
+						lifedays = parseInt(lifedays);
+						final = `${lifehour} hours ${lifedays} days`;
+					} else {
+						var finish = new Date();
+						lifehour = finish.getHours() - start.getHours();
+						lifetime = finish.getTime() - start.getTime();
+						lifedays = lifetime / (1000 * 3600 * 24);
+						lifedays = parseInt(lifedays);
+						final = `${lifehour} hours ${lifedays} days - Still pending`;
 					}
+					data.lifetime = final;
+					return data;
+				});
+				let solutions = solution;
+				if (user.usertype === 'manager') {
+					solutions = solution;
+				} else if (user.usertype === 'team-member') {
+					solutions = solution.filter((dt) => dt.assignedId === user._id);
+					// console.log(user.usertype, 'admin');
+					// console.log(solution);
+				} else {
+					solutions = solution.filter((dt) => dt.by_id === user._id);
 				}
 				// console.log(solution);
-				return dispatch({ type: GET_REQUESTS, payload: solution });
+				dispatch(notInProgress());
+				return dispatch({ type: GET_REQUESTS, payload: solutions });
 			}
 			// Message.success('Sign complete. Taking you to your dashboard!').then(() => Router.push('/dashboard'));
 			Message.error(response.data.msg);
+			dispatch(notInProgress());
 			return dispatch({ type: REQUEST_ERR, payload: response.data.msg });
 		})
 		.catch((err) => {
 			console.log(err);
 			Message.error(err.response.data.msg);
+			dispatch(notInProgress());
 			return dispatch({ type: REQUEST_ERR, payload: err.response.data.msg });
 		});
 };
@@ -89,6 +130,8 @@ export const getRequestLocal = async (user) => {
 				assigned: data.assigned,
 				assignedId: data.assignedId,
 				picture: data.picture,
+				property: data.property,
+				propertyId: data.propertyId,
 				rating: data.rating,
 				description: data.description,
 				timecompleted: data.timecompleted,
@@ -96,15 +139,41 @@ export const getRequestLocal = async (user) => {
 			// data.key = data._id;
 			return dt;
 		});
-		let solution = final;
-		if (user.usertype !== 'manager') {
-			if (user.usertype !== 'admin') {
-				solution = final.filter((dt) => dt.by_id === user._id);
+		let solution = final.filter((data) => {
+			var lifetime;
+			var lifedays;
+			var lifehour;
+			var final;
+			var start = new Date(data.timestart);
+			if (data.status == 'done') {
+				var finish = new Date(data.timecompleted);
+				lifehour = finish.getHours() - start.getHours();
+				lifetime = finish.getTime() - start.getTime();
+				lifedays = lifetime / (1000 * 3600 * 24);
+				lifedays = parseInt(lifedays);
+				final = `${lifehour} hours ${lifedays} days`;
+			} else {
+				var finish = new Date();
+				lifehour = finish.getHours() - start.getHours();
+				lifetime = finish.getTime() - start.getTime();
+				lifedays = lifetime / (1000 * 3600 * 24);
+				lifedays = parseInt(lifedays);
+				final = `${lifehour} hours ${lifedays} days - Still pending`;
 			}
+			data.lifetime = final;
+			return data;
+		});
+		let solutions = solution;
+		if (user.usertype === 'manager') {
+			solutions = solution;
+		} else if (user.usertype === 'team-member') {
+			solutions = solution.filter((dt) => dt.assignedId === user._id);
+			// console.log(user.usertype, 'admin');
+			// console.log(solution);
+		} else {
+			solutions = solution.filter((dt) => dt.by_id === user._id);
 		}
-		// console.log(user.usertype, 'admin');
-		// console.log(solution);
-		return solution;
+		return solutions;
 	} catch (error) {
 		console.error(error.response);
 	}
@@ -163,6 +232,7 @@ export const getDayRequestNo = (datas, week, day) => {
 };
 
 export const getRequest = (id) => (dispatch) => {
+	dispatch(inProgress());
 	axios
 		.get(`/api/request/${id}`)
 		.then((response) => {
@@ -182,26 +252,33 @@ export const getRequest = (id) => (dispatch) => {
 					assigned: data.assigned,
 					assignedId: data.assignedId,
 					rating: data.rating,
+					property: data.property,
+					propertyId: data.propertyId,
 					description: data.description,
 					date: date.toDateString(),
 					timestart: data.timestart,
 					timecompleted: data.timecompleted,
 				};
+				dispatch(notInProgress());
 				return dispatch({ type: GET_REQUEST, payload: dt });
 			}
+
 			// Message.success('Sign complete. Taking you to your dashboard!').then(() => Router.push('/dashboard'));
 			Message.error(response.data.msg);
+			dispatch(notInProgress());
 			return dispatch({ type: REQUEST_ERR, payload: response.data.msg });
 		})
 		.catch((err) => {
 			console.log(err);
 			Message.error(err.response.data.msg);
+			dispatch(notInProgress());
 			return dispatch({ type: REQUEST_ERR, payload: err.response.data.msg });
 		});
 };
 
 export const deleteRequest = (id, user) => (dispatch) => {
 	const token = getCookie('token');
+	dispatch(inProgress());
 	axios
 		.delete(`/api/request/${id}`, {
 			headers: {
@@ -213,20 +290,24 @@ export const deleteRequest = (id, user) => (dispatch) => {
 		.then((result) => {
 			if (result.data.success) {
 				Message.success('Request is deleted successfully');
+				dispatch(notInProgress());
 				return dispatch(getRequests(user));
 			}
 			Message.error('Error while deleting the request');
+			return dispatch(notInProgress());
 		})
 		.catch((err) => {
 			Message.error('Unable to delete this request');
+			dispatch(notInProgress());
 			return console.log(err.reponse);
 		});
 };
 
 export const addRequest = (body, user) => (dispatch) => {
-	body.from = user._id;
+	// body.from = user._id;
 	// console.log(body);
 	const token = getCookie('token');
+	dispatch(inProgress());
 	axios
 		.post(`/api/request`, body, {
 			headers: {
@@ -238,19 +319,29 @@ export const addRequest = (body, user) => (dispatch) => {
 		.then((result) => {
 			if (result.data.success) {
 				Message.success('Request is added successfully');
+				dispatch(notInProgress());
+				dispatch(requestOpenAndClose());
 				return dispatch(getRequests(user));
 			}
 			Message.error('Error while adding request');
+			return dispatch(notInProgress());
 		})
 		.catch((err) => {
 			Message.error('Unable to add this request');
+			dispatch(notInProgress());
 			return console.log(err.response);
 		});
 };
 
 export const changeRequestStatus = (body, id, user) => (dispatch) => {
 	const token = getCookie('token');
-	const data = { status: body.status };
+	dispatch(inProgress());
+	let data = {};
+	if (body.status === 'done') {
+		data = { status: body.status, timecompleted: Date.now() };
+	} else {
+		data = { status: body.status };
+	}
 	axios
 		.patch(`/api/request/${id}`, data, {
 			headers: {
@@ -262,12 +353,16 @@ export const changeRequestStatus = (body, id, user) => (dispatch) => {
 		.then((result) => {
 			if (result.data.success) {
 				Message.success('Request status is changed successfully');
+				dispatch(notInProgress());
+				dispatch(requestOpenAndClose3());
 				return dispatch(getRequests(user));
 			}
 			Message.error('Error while changing the request status');
+			return dispatch(notInProgress());
 		})
 		.catch((err) => {
 			Message.error('Unable to change this request status');
+			dispatch(notInProgress());
 			return console.log(err.response);
 		});
 };
@@ -290,7 +385,7 @@ export const changeRating = (body, id, user) => (dispatch) => {
 				Message.success('Request rating is changed successfully');
 				return dispatch(getRequests(user));
 			}
-			Message.error('Error while changing the request rating');
+			return Message.error('Error while changing the request rating');
 		})
 		.catch((err) => {
 			Message.error('Unable to change this request rating');
@@ -300,6 +395,7 @@ export const changeRating = (body, id, user) => (dispatch) => {
 
 export const assignMember = (body, id, user) => (dispatch) => {
 	const token = getCookie('token');
+	dispatch(inProgress());
 	const data = { assigned: body.name, assignedId: body.id };
 	// console.log(data);
 	if (user.usertype !== 'manager') return;
@@ -314,12 +410,16 @@ export const assignMember = (body, id, user) => (dispatch) => {
 		.then((result) => {
 			if (result.data.success) {
 				Message.success('Team Member is Assigned Successfully');
+				dispatch(notInProgress());
+				dispatch(requestOpenAndClose2());
 				return dispatch(getRequests(user));
 			}
 			Message.error('Error while assigning team member');
+			return dispatch(notInProgress());
 		})
 		.catch((err) => {
 			Message.error('Unable to assign team member');
+			dispatch(notInProgress());
 			return console.log(err.response);
 		});
 };

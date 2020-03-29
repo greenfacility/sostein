@@ -201,8 +201,12 @@ const Overview = (props) => {
 					</FlexibleWidthXYPlot>
 				</NoSSR>
 			</Card>
-			<RequestTable />
-			<PropertyTable />
+			<Col sm={24} md={24} className="mb-4">
+				<RequestTable />
+			</Col>
+			<Col sm={24} md={24} className="mb-4">
+				<PropertyTable />
+			</Col>
 		</div>
 	);
 };

@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Input, Divider, Select, Menu, Row, Message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { editService, getService } from '../../../redux/actions';
+import { editService, getService, serviceOpenAndClose2 } from '../../../redux/actions';
 import { Edit } from 'react-feather';
 import FormItem from 'antd/lib/form/FormItem';
 import TextArea from 'antd/lib/input/TextArea';
@@ -14,9 +14,7 @@ class EditData extends Component {
 
 	showModal = (id) => {
 		this.props.getService(id);
-		this.setState({
-			visible: true,
-		});
+		this.props.serviceOpenAndClose2();
 	};
 
 	handleOk = () => {
@@ -60,7 +58,8 @@ class EditData extends Component {
 		// 		},
 		// 	},
 		// };
-		const { visible, loading } = this.state;
+		// const { visible, loading } = this.state;
+		const { loading, serviceopen2 } = this.props.ux;
 		const { getFieldDecorator } = this.props.form;
 		// const Option = Select.Option;
 
@@ -77,7 +76,7 @@ class EditData extends Component {
 					Edit Service
 				</Button>
 				<Modal
-					visible={visible}
+					visible={serviceopen2}
 					title="Edit Service"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}
@@ -121,4 +120,4 @@ class EditData extends Component {
 	}
 }
 
-export default connect((state) => state, { editService, getService })(Form.create()(EditData));
+export default connect((state) => state, { editService, getService, serviceOpenAndClose2 })(Form.create()(EditData));

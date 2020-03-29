@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Input, Divider, Select, Menu, Row, Message } from 'antd';
 import { Edit } from 'react-feather';
 import { connect } from 'react-redux';
-import { addService } from '../../../redux/actions';
+import { addService, serviceOpenAndClose } from '../../../redux/actions';
 import React, { Component } from 'react';
 import FormItem from 'antd/lib/form/FormItem';
 
@@ -11,11 +11,7 @@ class AddData1 extends Component {
 		visible: false,
 	};
 
-	showModal = () => {
-		this.setState({
-			visible: true,
-		});
-	};
+	showModal = () => this.props.serviceOpenAndClose();
 
 	handleOk = () => {
 		const { validateFields } = this.props.form;
@@ -30,9 +26,7 @@ class AddData1 extends Component {
 		});
 	};
 
-	handleCancel = () => {
-		this.setState({ visible: false });
-	};
+	handleCancel = () => this.props.serviceOpenAndClose();
 
 	render() {
 		const formItemLayout = {
@@ -57,7 +51,8 @@ class AddData1 extends Component {
 				},
 			},
 		};
-		const { visible, loading } = this.state;
+		// const { visible, loading } = this.state;
+		const { loading, serviceopen } = this.props.ux;
 		const { getFieldDecorator } = this.props.form;
 		// const Option = Select.Option;
 
@@ -75,7 +70,7 @@ class AddData1 extends Component {
 					Add Service
 				</Button>
 				<Modal
-					visible={visible}
+					visible={serviceopen}
 					title="Add Service"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}
@@ -117,5 +112,5 @@ class AddData1 extends Component {
 	}
 }
 
-export default connect((state) => state, { addService })(Form.create()(AddData1));
+export default connect((state) => state, { addService, serviceOpenAndClose })(Form.create()(AddData1));
 // export default Form.create()(AddData1);

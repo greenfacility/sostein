@@ -98,7 +98,13 @@ class Signin extends Component {
 									<small>Forgot password</small>
 								</a>
 							</Link>
-							<Button loading={this.props.ux.btnloading} type="primary" htmlType="submit" block className="mt-3">
+							<Button
+								loading={this.props.ux.loading}
+								type="primary"
+								htmlType="submit"
+								block
+								className="mt-3"
+							>
 								Sign In
 							</Button>
 						</FormItem>

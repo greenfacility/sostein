@@ -60,67 +60,6 @@ const Legend = styled.div`
 	}
 `;
 
-const menu = (
-	<Menu>
-		<Menu.Item>
-			<Row type="flex" align="middle">
-				<Archive size={16} strokeWidth={1} className="mr-3" /> <span>Archive</span>
-			</Row>
-		</Menu.Item>
-		<Menu.Item>
-			<Row type="flex" align="middle">
-				<Edit size={16} strokeWidth={1} className="mr-3" /> <span>Edit</span>
-			</Row>
-		</Menu.Item>
-		<Menu.Item>
-			<Row type="flex" align="middle">
-				<Trash size={16} strokeWidth={1} className="mr-3" /> <span>Delete</span>
-			</Row>
-		</Menu.Item>
-		<Menu.Divider />
-		<Menu.Item>
-			<Row type="flex" align="middle">
-				<Save size={16} strokeWidth={1} className="mr-3" /> <span>Save as</span>
-			</Row>
-		</Menu.Item>
-		<Menu.Item>
-			<Row type="flex" align="middle">
-				<Printer size={16} strokeWidth={1} className="mr-3" /> <span>Print</span>
-			</Row>
-		</Menu.Item>
-	</Menu>
-);
-
-const data = [
-	{
-		title: 'Total Work Done',
-		subtitle: (
-			<span>
-				<span className="mr-1">580</span>
-				<TrendingUp size={20} strokeWidth={1} className="text-success" />
-			</span>
-		),
-	},
-	{
-		title: 'Total Work Completed',
-		subtitle: (
-			<span>
-				<span className="mr-1">570</span>
-				<TrendingUp size={20} strokeWidth={1} className="text-success" />
-			</span>
-		),
-	},
-	{
-		title: 'Total Down Feedback',
-		subtitle: (
-			<span>
-				<span className="mr-1">10</span>
-				<TrendingDown size={20} strokeWidth={1} className="text-error" />
-			</span>
-		),
-	},
-];
-
 const TimelinePeriod = ({ content }) => (
 	<small
 		className="text-muted"
@@ -140,8 +79,43 @@ const getWeekNumber = (d) => {
 	return [ d.getUTCFullYear(), weekNo, d.getMonth() + 1 ];
 };
 
+const generateRating = (requests = []) => {
+	let totalRate = 0;
+	requests.map((data) => {
+		if (data.rating != 0) {
+			totalRate = totalRate + data.rating;
+		} else {
+			totalRate = totalRate + 5;
+		}
+	});
+	let rpercent = totalRate / (5 * requests.length) * 100;
+	return parseInt(rpercent);
+};
+
 const Overview = (props) => {
 	const [ days, setstate ] = useState(getWeekNumber(new Date()));
+	const [ rating, setRating ] = useState(generateRating(props.requests.requests) || 0);
+
+	const data = [
+		{
+			title: 'Total Work Assigned',
+			subtitle: (
+				<span>
+					<span className="mr-1">{props.requests.requests.length}</span>
+					<TrendingUp size={20} strokeWidth={1} className="text-success" />
+				</span>
+			),
+		},
+		{
+			title: 'Total Work Completed',
+			subtitle: (
+				<span>
+					<span className="mr-1">{props.requests.requests.filter((dt) => dt.status === 'done').length}</span>
+					<TrendingUp size={20} strokeWidth={1} className="text-success" />
+				</span>
+			),
+		},
+	];
 
 	const axes = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat' ];
 
@@ -214,7 +188,7 @@ const Overview = (props) => {
 						<Row type="flex" align="middle" justify="center" gutter={16} className="py-4">
 							<Progress
 								type="dashboard"
-								percent={90}
+								percent={rating}
 								width={181}
 								format={(percent) => (
 									<span className="text-center">
@@ -233,7 +207,7 @@ const Overview = (props) => {
                         display: block;
                       `}
 										>
-											{percent}
+											{percent}%
 										</div>
 										<div className="h6">
 											<small>User Rating</small>

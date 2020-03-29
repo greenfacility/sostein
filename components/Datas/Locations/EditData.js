@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Input, Divider, Select, Menu, Row, Message } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { editLocation, getLocation } from '../../../redux/actions';
+import { editLocation, getLocation, locationOpenAndClose2 } from '../../../redux/actions';
 import { Edit } from 'react-feather';
 import FormItem from 'antd/lib/form/FormItem';
 import TextArea from 'antd/lib/input/TextArea';
@@ -14,9 +14,7 @@ class EditData extends Component {
 
 	showModal = (id) => {
 		this.props.getLocation(id);
-		this.setState({
-			visible: true,
-		});
+		this.props.locationOpenAndClose2();
 	};
 
 	handleOk = () => {
@@ -32,9 +30,7 @@ class EditData extends Component {
 		});
 	};
 
-	handleCancel = () => {
-		this.setState({ visible: false });
-	};
+	handleCancel = () => this.props.locationOpenAndClose2();
 
 	render() {
 		// console.log(this.props);
@@ -60,8 +56,9 @@ class EditData extends Component {
 		// 		},
 		// 	},
 		// };
-		const { visible, loading } = this.state;
+		// const { visible, loading } = this.state;
 		const { getFieldDecorator } = this.props.form;
+		const { loading, locationopen2 } = this.props.ux;
 		// const Option = Select.Option;
 
 		// const prefixSelector = getFieldDecorator('prefix', {
@@ -77,7 +74,7 @@ class EditData extends Component {
 					Edit Location
 				</Button>
 				<Modal
-					visible={visible}
+					visible={locationopen2}
 					title="Edit Location"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}
@@ -121,4 +118,4 @@ class EditData extends Component {
 	}
 }
 
-export default connect((state) => state, { editLocation, getLocation })(Form.create()(EditData));
+export default connect((state) => state, { editLocation, getLocation, locationOpenAndClose2 })(Form.create()(EditData));

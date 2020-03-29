@@ -57,8 +57,15 @@ const handler = (req, res, db) => {
 			break;
 		// Create new service
 		case 'POST':
-			var { name, type, from, description, picture } = req.body;
-			if (name !== '' || type !== '' || from !== '' || description !== '') {
+			var { name, type, from, description, picture, property, propertyId } = req.body;
+			if (
+				name !== '' &&
+				type !== '' &&
+				from !== '' &&
+				description !== '' &&
+				property !== '' &&
+				propertyId !== ''
+			) {
 				authCheck(req, res, db).Request
 					.find({ name })
 					.then((data) => {
@@ -71,6 +78,8 @@ const handler = (req, res, db) => {
 							from,
 							description,
 							picture,
+							property,
+							propertyId,
 						});
 						newRequest.save().then((result) => res.status(201).json({ success: true, result }));
 					})

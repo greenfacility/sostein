@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Input, Divider, Select, Menu, Row, Message } from 'antd';
 import { Edit, Eye } from 'react-feather';
 import { connect } from 'react-redux';
-import { createUser } from '../../../redux/actions';
+import { createUser, userOpenAndClose } from '../../../redux/actions';
 import React, { Component } from 'react';
 import TextArea from 'antd/lib/input/TextArea';
 import FormItem from 'antd/lib/form/FormItem';
@@ -12,11 +12,7 @@ class AddData extends Component {
 		visible: false,
 	};
 
-	showModal = () => {
-		this.setState({
-			visible: true,
-		});
-	};
+	showModal = () => this.props.userOpenAndClose();
 
 	handleOk = () => {
 		const { validateFields } = this.props.form;
@@ -33,9 +29,7 @@ class AddData extends Component {
 		});
 	};
 
-	handleCancel = () => {
-		this.setState({ visible: false });
-	};
+	handleCancel = () => this.props.userOpenAndClose();
 
 	render() {
 		const formItemLayout = {
@@ -48,7 +42,8 @@ class AddData extends Component {
 				sm: { span: 16 },
 			},
 		};
-		const { visible, loading } = this.state;
+		// const { visible, loading } = this.state;
+		const { loading, useropen } = this.props.ux;
 		const { getFieldDecorator, getFieldValue } = this.props.form;
 		const Option = Select.Option;
 
@@ -66,7 +61,7 @@ class AddData extends Component {
 					Add User
 				</Button>
 				<Modal
-					visible={visible}
+					visible={useropen}
 					title="Add User"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}

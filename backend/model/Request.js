@@ -19,6 +19,14 @@ export default new mongoose.Schema({
 		type: String,
 		required: false,
 	},
+	property: {
+		type: String,
+		required: true,
+	},
+	propertyId: {
+		type: String,
+		required: true,
+	},
 	description: {
 		type: String,
 		required: true,
