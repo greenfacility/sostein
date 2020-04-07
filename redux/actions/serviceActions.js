@@ -29,10 +29,10 @@ export const getServices = () => (dispatch) => {
 		});
 };
 
-export const getServicesLocal = async () => {
+export const getServicesLocal = async (host) => {
 	try {
-		const res = await axios.get(`/api/service`);
-		const data = await res.data;
+		const res = await fetch(`${host}/api/service`);
+		const data = await res.json();
 		if (data.msg) {
 			Message.error(data.msg);
 			return;
@@ -43,8 +43,8 @@ export const getServicesLocal = async () => {
 		});
 		return final;
 	} catch (error) {
-		if (error.response.data.msg) {
-			Message.error(error.response.data.msg);
+		if (error) {
+			Message.error(error);
 			return;
 		}
 	}

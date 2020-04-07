@@ -24,7 +24,9 @@ import {
 	HorizontalGridLines,
 	VerticalBarSeries,
 	VerticalGridLines,
+	RadialChart,
 	LineSeries,
+	Hint,
 	XAxis,
 	YAxis,
 } from 'react-vis';
@@ -136,6 +138,7 @@ const getWeekNumber = (d) => {
 
 const Overview = (props) => {
 	const [ days, setstate ] = useState(getWeekNumber(new Date()));
+	const [ value, setValue ] = useState(false);
 
 	const axes = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat' ];
 
@@ -161,7 +164,7 @@ const Overview = (props) => {
 
 	const series = [
 		{
-			title: 'Total Request',
+			title: 'Total Work Order',
 			data: generate(),
 			color: '#007bff',
 		},
@@ -174,12 +177,38 @@ const Overview = (props) => {
 
 	const handleChange = (e) => {
 		if (e == null) return;
+		ourData;
 		let date = getWeekNumber(new Date(e._d));
 		// console.log(e)
 		// console.log(new Date(e._d), new Date())
 		setstate(date);
 		// generate()
 	};
+
+	var requests = props.requests.requests;
+
+	var pendingReq = requests.filter((dt) => dt.status === 'pending').length;
+	var ongoingReq = requests.filter((dt) => dt.status === 'on-going').length;
+	var holdReq = requests.filter((dt) => dt.status === 'hold').length;
+	var parkReq = requests.filter((dt) => dt.status === 'park').length;
+	var doneReq = requests.filter((dt) => dt.status === 'done').length;
+
+	const ourData = [
+		{ theta: pendingReq || 0, color: '#007bff', title: 'Pending', className: 'custom-class' },
+		{ theta: doneReq || 0, color: '#52c41a', title: 'Done' },
+		{ theta: ongoingReq || 0, color: '#faad14', title: 'Ongoing' },
+		{ theta: holdReq || 0, color: '#f5222d', title: 'Hold' },
+		{ theta: parkReq || 0, color: '#52ffff', title: 'Park' },
+	];
+
+	const finalFilter = () => {
+		let arr = [];
+		ourData.map((dt) => {
+			arr.push({ x: dt.title, y: dt.theta });
+		});
+		return arr;
+	};
+
 	return (
 		<div>
 			<Card title="User Statistics" bodyStyle={{ padding: '1rem' }} className="mb-4">
@@ -201,6 +230,43 @@ const Overview = (props) => {
 					</FlexibleWidthXYPlot>
 				</NoSSR>
 			</Card>
+			<Col sm={24} md={24}>
+				<Col sm={24} md={12} className="mb-4">
+					<Card>
+						<NoSSR>
+							<RadialChart
+								className={'donut-chart-example m-auto'}
+								innerRadius={80}
+								radius={140}
+								getAngle={(d) => d.theta}
+								data={ourData}
+								getLabel={(d) => d.title}
+								showLabels
+								onValueMouseOver={(v) => setValue(v)}
+								onSeriesMouseOut={(v) => setValue(false)}
+								width={300}
+								height={300}
+								padAngle={0.04}
+							>
+								{value && <Hint value={value} />}
+							</RadialChart>
+						</NoSSR>
+					</Card>
+				</Col>
+				<Col sm={24} md={12} className="mb-4">
+					<Card>
+						<NoSSR>
+							<FlexibleWidthXYPlot xType="ordinal" height={320} xDistance={100}>
+								<VerticalGridLines style={{ strokeWidth: 0.5 }} />
+								<HorizontalGridLines style={{ strokeWidth: 0.5 }} />
+								<XAxis style={{ strokeWidth: 0.5 }} />
+								<YAxis style={{ strokeWidth: 0.5 }} />
+								<VerticalBarSeries color={ourData[1].color} data={finalFilter()} />
+							</FlexibleWidthXYPlot>
+						</NoSSR>
+					</Card>
+				</Col>
+			</Col>
 			<Col sm={24} md={24} className="mb-4">
 				<RequestTable />
 			</Col>

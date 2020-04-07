@@ -82,11 +82,11 @@ class EditData extends Component {
 		return (
 			<div>
 				<Button type="primary" onClick={(e) => this.showModal(this.props.id)}>
-					Edit Property
+					Edit Site
 				</Button>
 				<Modal
 					visible={propertyopen2}
-					title="Edit Property"
+					title="Edit Site"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}
 					footer={[
@@ -119,16 +119,16 @@ class EditData extends Component {
 							)}
 						</FormItem>
 
-						<FormItem {...formItemLayout} label="Property">
+						<FormItem {...formItemLayout} label="Site">
 							{getFieldDecorator('property', {
 								rules: [
 									{
 										required: true,
-										message: 'Please input property!',
+										message: 'Please input site!',
 									},
 								],
 								initialValue: this.props.properties.property.property,
-							})(<Input placeholder="Property" />)}
+							})(<Input placeholder="Site" />)}
 						</FormItem>
 						<FormItem {...formItemLayout} label="Location">
 							{getFieldDecorator('location', {

@@ -1,4 +1,5 @@
 import Cors from 'micro-cors';
+// import cron from 'node-cron';
 import connectToDb from '../../../backend/config/db';
 import authCheck from '../../../backend/config/auth';
 
@@ -11,6 +12,23 @@ const handler = (req, res, db) => {
 	res.setHeader('Access-Control-Allow-Headers', '*');
 	res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, PUT, PATCH, GET, DELETE, POST');
 
+	// const job = cron.schedule('*/1 * * * *', () => {
+	// 	console.log('Cron Job is running', Date.now());
+	// });
+	// job.start();
+	// setInterval(() => {
+	// 	Request.find({})
+	// 		.populate('from type')
+	// 		.sort({ timestart: -1 })
+	// 		.then((data) => {
+	// 			// console.log(data);
+	// 			data.map(dt => {
+	// 				const time = dt.timestart
+	// 			})
+	// 		})
+	// 		.catch((err) => console.log(err));
+	// 	console.log('Set Interval is running', Date.now());
+	// }, 100000);
 	const method = req.method;
 	const Request = db.Request;
 	switch (method) {

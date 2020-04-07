@@ -80,12 +80,12 @@ const handler = (req, res, db) => {
 			var { password, firstname, lastname, email, phonenumber, address, picture, about } = req.body;
 
 			if (
-				!password ||
-				!firstname ||
-				!lastname ||
-				!email ||
-				!phonenumber ||
-				!address ||
+				!password &&
+				!firstname &&
+				!lastname &&
+				!email &&
+				!phonenumber &&
+				!address &&
 				!about
 				// !picture
 			) {

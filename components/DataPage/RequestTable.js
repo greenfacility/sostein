@@ -7,6 +7,7 @@ import EditData from '../Datas/Requests/EditData';
 import AssignMember from '../Datas/Requests/AssignMember';
 import { deleteRequest } from '../../redux/actions';
 import Rater from '../Rating/Rater';
+import SetTimeSchedule from '../Datas/Requests/SetTimeSchedule';
 
 class RequestTable extends Component {
 	state = {
@@ -81,6 +82,13 @@ class RequestTable extends Component {
 				...this.getColumnSearchProps('name'),
 			},
 			{
+				title: 'Description',
+				dataIndex: 'description',
+				key: 'description',
+				width: '30%',
+				...this.getColumnSearchProps('description'),
+			},
+			{
 				title: 'Date',
 				dataIndex: 'date',
 				key: 'date',
@@ -95,6 +103,13 @@ class RequestTable extends Component {
 				...this.getColumnSearchProps('lifetime'),
 			},
 			{
+				title: 'Scheduled Time',
+				dataIndex: 'timescheduled',
+				key: 'timescheduled',
+				width: '20%',
+				...this.getColumnSearchProps('timescheduled'),
+			},
+			{
 				title: 'Type',
 				dataIndex: 'type',
 				key: 'type',
@@ -102,7 +117,7 @@ class RequestTable extends Component {
 				...this.getColumnSearchProps('type'),
 			},
 			{
-				title: 'Property',
+				title: 'Project Site',
 				dataIndex: 'property',
 				key: 'property',
 				width: '20%',
@@ -149,6 +164,7 @@ class RequestTable extends Component {
 								<Menu>
 									<EditData id={record._id} />
 									{usertype === 'manager' && <AssignMember id={record._id} />}
+									{usertype === 'team-member' && <SetTimeSchedule id={record._id} />}
 									{usertype === 'manager' && (
 										<Menu.Item
 											onClick={(e) =>
@@ -177,6 +193,7 @@ class RequestTable extends Component {
 			if (usertype !== 'team-member') {
 				// data = columns.filter((cols) => cols.key !== 'action');
 				data = data.filter((cols) => cols.key !== 'from');
+				data = data.filter((cols) => cols.key !== 'timescheduled');
 				// console.log(data);
 			}
 		}
@@ -186,7 +203,7 @@ class RequestTable extends Component {
 		var pendingReq = requests.filter((dt) => dt.status === 'pending');
 		var ongoingReq = requests.filter((dt) => dt.status === 'on-going');
 		var holdReq = requests.filter((dt) => dt.status === 'hold');
-		var parkReq = requests.filter((dt) => dt.status === 'pack');
+		var parkReq = requests.filter((dt) => dt.status === 'park');
 		var doneReq = requests.filter((dt) => dt.status === 'done');
 		// console.log(pendingReq);
 
@@ -202,7 +219,7 @@ class RequestTable extends Component {
 				>
 					<Menu.Item key="1">Pending</Menu.Item>
 					<Menu.Item key="2">Done</Menu.Item>
-					<Menu.Item key="3">Pack</Menu.Item>
+					<Menu.Item key="3">Park</Menu.Item>
 					<Menu.Item key="4">Hold</Menu.Item>
 					<Menu.Item key="5">On-going</Menu.Item>
 				</Menu>

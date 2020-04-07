@@ -20,6 +20,7 @@ import {
 	requestOpenAndClose,
 	requestOpenAndClose2,
 	requestOpenAndClose3,
+	requestOpenAndClose4,
 } from './uxActions';
 
 export const getRequests = (user) => (dispatch) => {
@@ -29,6 +30,7 @@ export const getRequests = (user) => (dispatch) => {
 		.then((response) => {
 			if (response.data.status) {
 				const final = response.data.result.map((data) => {
+					var schedule = new Date(data.timescheduled);
 					var date = new Date(data.timestart);
 					let dt = {
 						_id: data._id,
@@ -48,6 +50,7 @@ export const getRequests = (user) => (dispatch) => {
 						propertyId: data.propertyId,
 						date: date.toDateString(),
 						timecompleted: data.timecompleted,
+						timescheduled: schedule.toDateString(),
 					};
 					// data.key = data._id;
 					return dt;
@@ -103,12 +106,12 @@ export const getRequests = (user) => (dispatch) => {
 		});
 };
 
-export const getRequestLocal = async (user) => {
+export const getRequestLocal = async (host, user) => {
 	// console.log(getGroup());
 	try {
-		const res = await axios.get(`/api/request`);
+		const res = await fetch(`${host}/api/request`);
 
-		const data = await res.data;
+		const data = await res.json();
 
 		if (data.msg) {
 			// Message.error(data.msg);
@@ -117,6 +120,7 @@ export const getRequestLocal = async (user) => {
 		}
 		const final = data.result.map((data) => {
 			var date = new Date(data.timestart);
+			var schedule = new Date(data.timescheduled);
 			let dt = {
 				_id: data._id,
 				key: data._id,
@@ -135,6 +139,7 @@ export const getRequestLocal = async (user) => {
 				rating: data.rating,
 				description: data.description,
 				timecompleted: data.timecompleted,
+				timescheduled: schedule.toDateString(),
 			};
 			// data.key = data._id;
 			return dt;
@@ -175,7 +180,7 @@ export const getRequestLocal = async (user) => {
 		}
 		return solutions;
 	} catch (error) {
-		console.error(error.response);
+		console.error(error);
 	}
 };
 
@@ -240,6 +245,7 @@ export const getRequest = (id) => (dispatch) => {
 			if (response.data.success) {
 				const data = response.data.result;
 				var date = new Date(data.timestart);
+				var schedule = new Date(data.timescheduled);
 				let dt = {
 					_id: data._id,
 					key: data._id,
@@ -258,6 +264,7 @@ export const getRequest = (id) => (dispatch) => {
 					date: date.toDateString(),
 					timestart: data.timestart,
 					timecompleted: data.timecompleted,
+					timescheduled: schedule.toDateString(),
 				};
 				dispatch(notInProgress());
 				return dispatch({ type: GET_REQUEST, payload: dt });
@@ -398,7 +405,7 @@ export const assignMember = (body, id, user) => (dispatch) => {
 	dispatch(inProgress());
 	const data = { assigned: body.name, assignedId: body.id };
 	// console.log(data);
-	if (user.usertype !== 'manager') return;
+	if (user.usertype !== 'manager') return dispatch(notInProgress());
 	axios
 		.patch(`/api/request/${id}`, data, {
 			headers: {
@@ -419,6 +426,37 @@ export const assignMember = (body, id, user) => (dispatch) => {
 		})
 		.catch((err) => {
 			Message.error('Unable to assign team member');
+			dispatch(notInProgress());
+			return console.log(err.response);
+		});
+};
+
+export const scheduleTime = (body, id, user) => (dispatch) => {
+	const token = getCookie('token');
+	dispatch(inProgress());
+	const data = { email: user.email, timescheduled: body.timescheduled };
+	// console.log(data);
+	if (user.usertype === 'manager' || user.usertype === 'user') return dispatch(notInProgress());
+	axios
+		.put(`/api/request/${id}`, data, {
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				Authorization: `${token}`,
+			},
+		})
+		.then((result) => {
+			if (result.data.success) {
+				Message.success('Time was scheduled successfully');
+				dispatch(notInProgress());
+				dispatch(requestOpenAndClose4());
+				return dispatch(getRequests(user));
+			}
+			Message.error('Error while schedulling time');
+			return dispatch(notInProgress());
+		})
+		.catch((err) => {
+			Message.error('Unable to schedule time');
 			dispatch(notInProgress());
 			return console.log(err.response);
 		});

@@ -17,6 +17,10 @@ export default new mongoose.Schema({
 		type: String,
 		required: true,
 	},
+	resetpassword: {
+		type: String,
+		required: false,
+	},
 	phonenumber: {
 		type: Number,
 		required: true,

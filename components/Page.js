@@ -11,7 +11,7 @@ import { withRouter } from 'next/router';
 
 const { Content } = Layout;
 
-const NonDashboardRoutes = [ '/', '/signin', '/signup', '/forgot', '/lockscreen', '/_error' ];
+const NonDashboardRoutes = [ '/', '/signin', '/signup', '/forgot', '/lockscreen', '/_error', '/reset' ];
 
 const Page = ({ router, children }) => {
 	const [ loading, setLoading ] = useState(true);

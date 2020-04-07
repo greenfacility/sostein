@@ -133,16 +133,16 @@ class EditData extends Component {
 							})(<Input placeholder="Request Type" disabled />)}
 						</FormItem>
 
-						<FormItem {...formItemLayout} label="Property">
+						<FormItem {...formItemLayout} label="Project Site">
 							{getFieldDecorator('propertyId', {
 								rules: [
 									{
 										required: true,
-										message: 'Please select property!',
+										message: 'Please select project site!',
 									},
 								],
 								initialValue: this.props.requests.request.property,
-							})(<Input placeholder="Property" disabled />)}
+							})(<Input placeholder="Project Site" disabled />)}
 						</FormItem>
 						<FormItem {...formItemLayout} label="Status">
 							{getFieldDecorator('status', {

@@ -9,7 +9,7 @@ import { inProgress, notInProgress } from './uxActions';
 
 export const authenticate = (user) => (dispatch) => {
 	// console.log(user);
-	dispatch(inProgress());
+	// dispatch(inProgress());
 	axios
 		.post('/api/user', user)
 		.then((response) => {
@@ -38,7 +38,7 @@ export const deauthenticate = () => {
 
 export const register = (user) => (dispatch) => {
 	// console.log(user);
-	dispatch(inProgress());
+	// dispatch(inProgress());
 	axios
 		.put('/api/user', user)
 		.then((response) => {
@@ -104,23 +104,24 @@ export const getUser = (token) => (dispatch) => {
 			},
 		})
 		.then((response) => {
-			dispatch({ type: AUTHENTICATE, payload: response.data.token });
-			dispatch({ type: USERINFO, payload: response.data.user });
+			// console.log(response.data);
+			dispatch({ type: AUTHENTICATE, payload: token });
+			dispatch({ type: USERINFO, payload: response.data });
 			return { loaded: true };
 		})
 		.catch((err) => console.log(err.response.data));
 };
 
-export const getUserLocal = async (token) => {
+export const getUserLocal = async (host, token) => {
 	// console.log(token);
 	if (!token) return null;
-	const res = await axios.get(`/api/user`, {
+	const res = await fetch(`${host}/api/user`, {
 		headers: {
 			Accept: 'application/json',
 			Authorization: `${token}`,
 		},
 	});
-	const user = await res.data;
+	const user = await res.json();
 	// console.log(user);
 	return user;
 };

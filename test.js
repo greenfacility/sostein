@@ -4,25 +4,17 @@ var requests = [
 	{ timestart: '06/30/2018', status: 'pending' },
 ];
 
-requests.map((data) => {
-	var lifetime;
-	var lifedays;
-	var final;
-	var start = new Date(data.timestart);
-	if (data.status == 'done') {
-		var finish = new Date(data.timecompleted);
-		lifehour = finish.getHours() - start.getHours();
-		lifetime = finish.getTime() - start.getTime();
-		lifedays = lifetime / (1000 * 3600 * 24);
-		final = `${lifehour} ${lifedays}`;
-	} else {
-		var finish = new Date();
-		lifehour = finish.getHours() - start.getHours();
-		lifetime = finish.getTime() - start.getTime();
-		lifedays = lifetime / (1000 * 3600 * 24);
-		final = `${lifehour} ${lifedays} Still Counting`;
-	}
-	data.lifetime = final;
-});
+const object = { name: 'heyhey', password: '', timestart: '2018-06-29T18:00:00.000Z' };
 
-console.log(requests);
+for (let key in object) {
+	if (object[key] !== '') {
+		const element = object[key];
+		if (key === 'timestart') {
+			let date = new Date(object[key]);
+			let newdate = new Date(date.getTime() - 18000000);
+			console.log(newdate, date);
+		}
+	}
+}
+
+// console.log(requests);

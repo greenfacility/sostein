@@ -96,11 +96,11 @@ class AddData1 extends Component {
 		return (
 			<div>
 				<Button type="primary" onClick={this.showModal}>
-					New Property
+					Add Site
 				</Button>
 				<Modal
 					visible={propertyopen}
-					title="New Property"
+					title="Add Site"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}
 					footer={[
@@ -133,15 +133,15 @@ class AddData1 extends Component {
 							)}
 						</FormItem>
 
-						<FormItem {...formItemLayout} label="Property">
+						<FormItem {...formItemLayout} label="Site">
 							{getFieldDecorator('property', {
 								rules: [
 									{
 										required: true,
-										message: 'Please enter property!',
+										message: 'Please enter site!',
 									},
 								],
-							})(<Input placeholder="Property" />)}
+							})(<Input placeholder="Site" />)}
 						</FormItem>
 
 						<FormItem {...formItemLayout} label="Location">

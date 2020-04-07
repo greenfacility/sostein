@@ -1,6 +1,6 @@
 // import cookie from 'react-cookies';
 // import Router from 'next/router';
-// import fetch from 'isomorphic-unfetch';
+import fetch from 'isomorphic-unfetch';
 import axios from 'axios';
 import { Message } from 'antd';
 import {
@@ -50,10 +50,10 @@ export const getProperties = (user) => (dispatch) => {
 		});
 };
 
-export const getPropertyLocal = async (user) => {
+export const getPropertyLocal = async (host, user) => {
 	try {
-		const res = await axios.get(`/api/property`);
-		const data = await res.data;
+		const res = await fetch(`${host}/api/property`);
+		const data = await res.json();
 		// console.log(data);
 
 		if (data.msg) {
@@ -73,7 +73,7 @@ export const getPropertyLocal = async (user) => {
 		return solution;
 	} catch (error) {
 		console.log(error);
-		Message.error(error.response.data.msg);
+		Message.error(error);
 		return;
 	}
 };

@@ -56,5 +56,6 @@ export const LOCATIONOC2 = 'LOCATIONOC2';
 export const PROPERTYOC2 = 'PROPERTYOC2';
 export const REQUESTOC2 = 'REQUESTOC2';
 export const REQUESTOC3 = 'REQUESTOC3';
+export const REQUESTOC4 = 'REQUESTOC4';
 export const SERVICEOC2 = 'SERVICEOC2';
 export const USEROC2 = 'USEROC2';

@@ -24,6 +24,8 @@ import {
 	HorizontalGridLines,
 	VerticalBarSeries,
 	VerticalGridLines,
+	RadialChart,
+	Hint,
 	LineSeries,
 	XAxis,
 	YAxis,
@@ -95,6 +97,7 @@ const generateRating = (requests = []) => {
 const Overview = (props) => {
 	const [ days, setstate ] = useState(getWeekNumber(new Date()));
 	const [ rating, setRating ] = useState(generateRating(props.requests.requests) || 0);
+	const [ value, setValue ] = useState(false);
 
 	const axes = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat' ];
 
@@ -179,6 +182,31 @@ const Overview = (props) => {
 		setstate(date);
 		// generate()
 	};
+
+	var requests = props.requests.requests;
+
+	var pendingReq = requests.filter((dt) => dt.status === 'pending').length;
+	var ongoingReq = requests.filter((dt) => dt.status === 'on-going').length;
+	var holdReq = requests.filter((dt) => dt.status === 'hold').length;
+	var parkReq = requests.filter((dt) => dt.status === 'park').length;
+	var doneReq = requests.filter((dt) => dt.status === 'done').length;
+
+	const ourData = [
+		{ theta: pendingReq || 0, color: '#007bff', title: 'Pending', className: 'custom-class' },
+		{ theta: doneReq || 0, color: '#52c41a', title: 'Done' },
+		{ theta: ongoingReq || 0, color: '#faad14', title: 'Ongoing' },
+		{ theta: holdReq || 0, color: '#f5222d', title: 'Hold' },
+		{ theta: parkReq || 0, color: '#52ffff', title: 'Park' },
+	];
+
+	const finalFilter = () => {
+		let arr = [];
+		ourData.map((dt) => {
+			arr.push({ x: dt.title, y: dt.theta });
+		});
+		return arr;
+	};
+
 	return (
 		<div>
 			<Card title="Manager Statistics" bodyStyle={{ padding: '1rem' }} className="mb-4">
@@ -200,79 +228,46 @@ const Overview = (props) => {
 					</FlexibleWidthXYPlot>
 				</NoSSR>
 			</Card>
-
-			{/* <Card
-        title="User Statistics"
-        extra={
-          <Dropdown overlay={menu}>
-            <MoreHorizontal size={20} strokeWidth={1} fill={theme.textColor} />
-          </Dropdown>
-        }
-        bodyStyle={{ padding: '1rem' }}
-        className="mb-4"
-      >
-        <NoSSR>    
-          <Legend>
-            <DiscreteColorLegend width={180} height={20} items={series} />
-          </Legend>
-          <Legend>
-            <WeekPicker onChange={handleChange} placeholder="Select a week" />
-          </Legend>
-          <FlexibleWidthXYPlot height={300}>
-          <HorizontalGridLines style={{ stroke: '#B7E9ED', strokeWidth: 0.5 }} />
-          <VerticalGridLines style={{ stroke: '#B7E9ED', strokeWidth: 0.5 }} />
-          <XAxis
-            title="Days Of Month"
-            style={{
-              strokeWidth: 0.5,
-              line: { stroke: '#ADDDE1' },
-              ticks: { stroke: '#ADDDE1' },
-              text: { stroke: 'none', fill: '#6b6b76', fontWeight: 600 }
-            }}
-          />
-          <YAxis title="Work Done" style={{ strokeWidth: 0.5 }} />
-          <LineSeries
-            className="first-series"
-            color="#007bff"
-            curve={curveCatmullRom.alpha(0.5)}
-            data={series[1].data}
-            style={{
-              strokeLinejoin: 'round',
-              strokeWidth: 4
-            }}
-          />
-          <LineSeries
-            className="first-series"
-            color="#f5222d"
-            curve={curveCatmullRom.alpha(0.5)}
-            data={series[0].data}
-            style={{
-              strokeLinejoin: 'round',
-              strokeWidth: 4
-            }}
-          /> */}
-			{/* <LineSeries className="second-series" color="#52c41a" data={null} />
-      <LineSeries
-        className="third-series"
-        color="#f5222d"
-        curve={'curveMonotoneX'}
-        data={[
-          { x: 1, y: 10 },
-          { x: 2, y: 4 },
-          { x: 3, y: 2 },
-          { x: 4, y: 15 }
-        ]}
-        strokeDasharray="7, 3"
-      />
-      <LineSeries
-        className="fourth-series"
-        color="#faad14"
-        curve={curveCatmullRom.alpha(0.5)}
-        data={[{ x: 1, y: 7 }, { x: 2, y: 11 }, { x: 3, y: 9 }, { x: 4, y: 2 }]}
-      /> */}
-			{/* </FlexibleWidthXYPlot>
-</NoSSR>
-</Card> */}
+			<Col sm={24} md={24}>
+				<Col sm={24} md={12} className="mb-4">
+					<Card>
+						<NoSSR>
+							{/* <Legend>
+								<DiscreteColorLegend width={180} height={20} items={ourData} />
+							</Legend> */}
+							<RadialChart
+								className={'donut-chart-example m-auto'}
+								innerRadius={80}
+								radius={140}
+								getAngle={(d) => d.theta}
+								data={ourData}
+								getLabel={(d) => d.title}
+								showLabels
+								onValueMouseOver={(v) => setValue(v)}
+								onSeriesMouseOut={(v) => setValue(false)}
+								width={300}
+								height={300}
+								padAngle={0.04}
+							>
+								{value && <Hint value={value} />}
+							</RadialChart>
+						</NoSSR>
+					</Card>
+				</Col>
+				<Col sm={24} md={12} className="mb-4">
+					<Card>
+						<NoSSR>
+							<FlexibleWidthXYPlot xType="ordinal" height={320} xDistance={100}>
+								<VerticalGridLines style={{ strokeWidth: 0.5 }} />
+								<HorizontalGridLines style={{ strokeWidth: 0.5 }} />
+								<XAxis style={{ strokeWidth: 0.5 }} />
+								<YAxis style={{ strokeWidth: 0.5 }} />
+								<VerticalBarSeries color={ourData[1].color} data={finalFilter()} />
+							</FlexibleWidthXYPlot>
+						</NoSSR>
+					</Card>
+				</Col>
+			</Col>
 
 			<Row gutter={16}>
 				<Col sm={24} md={12} className="mb-4">

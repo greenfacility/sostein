@@ -58,4 +58,7 @@ export default new mongoose.Schema({
 	timecompleted: {
 		type: Date,
 	},
+	timescheduled: {
+		type: Date,
+	},
 });

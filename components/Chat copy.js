@@ -130,13 +130,13 @@ const Chat = () => {
 						<span
 							className="ml-3"
 							css={`
-                line-height: 1;
-              `}
+								line-height: 1;
+							`}
 						>
 							<span
 								css={`
-                  display: block;
-                `}
+									display: block;
+								`}
 							>
 								John Doe
 							</span>
@@ -147,14 +147,14 @@ const Chat = () => {
 					)}
 				</Row>
 				<span className="mr-auto" />
-				<Menu mode="horizontal" className="border-0">
+				{/* <Menu mode="horizontal" className="border-0">
 					<Menu.Item>
 						<SearchIcon size={20} strokeWidth={1} />
 					</Menu.Item>
 					<Menu.Item>
 						<Settings size={20} strokeWidth={1} />
 					</Menu.Item>
-				</Menu>
+				</Menu> */}
 			</Header>
 			<Layout>
 				{!state.mobile && (

@@ -9,6 +9,7 @@ import {
 	PROPERTYOC2,
 	REQUESTOC2,
 	REQUESTOC3,
+	REQUESTOC4,
 	SERVICEOC2,
 	USEROC2,
 } from '../actionTypes';
@@ -25,6 +26,7 @@ const uxReducer = (
 		propertyopen2: false,
 		requestopen2: false,
 		requestopen3: false,
+		requestopen4: false,
 		serviceopen2: false,
 		useropen2: false,
 	},
@@ -51,6 +53,8 @@ const uxReducer = (
 			return { ...state, requestopen2: !state.requestopen2 };
 		case REQUESTOC3:
 			return { ...state, requestopen3: !state.requestopen3 };
+		case REQUESTOC4:
+			return { ...state, requestopen4: !state.requestopen4 };
 		case SERVICEOC2:
 			return { ...state, serviceopen2: !state.serviceopen2 };
 		case USEROC2:

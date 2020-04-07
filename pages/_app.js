@@ -3,6 +3,7 @@ import '../assets/styles.less';
 // import App from 'next/app';
 import { Fragment, useState } from 'react';
 import redirect from 'next-redirect';
+import absoluteUrl from 'next-absolute-url';
 
 import LoadingOverlay from 'react-loading-overlay';
 import BounceLoader from 'react-spinners/HashLoader';
@@ -73,6 +74,8 @@ const MyApp = ({ Component, pageProps, store }) => {
 MyApp.getInitialProps = async ({ Component, ctx }) => {
 	let pageProps = {};
 	const userAgent = ctx.req ? ctx.req.headers['user-agent'] : navigator.userAgent;
+	const { origin } = absoluteUrl(ctx.req);
+	const hostname = origin;
 
 	let ie = false;
 	if (userAgent.match(/Edge/i) || userAgent.match(/Trident.*rv[ :]*11\./i)) {
@@ -80,13 +83,13 @@ MyApp.getInitialProps = async ({ Component, ctx }) => {
 	}
 
 	if (Component.getInitialProps) {
-		pageProps = await Component.getInitialProps(ctx);
+		pageProps = await Component.getInitialProps(ctx, hostname);
 	}
 
 	pageProps.query = ctx.query;
 	pageProps.ieBrowser = ie;
 
-	const NonDashboardRoutes = [ '/signin', '/signup', '/forgot', '/lockscreen', '/_error' ];
+	const NonDashboardRoutes = [ '/signin', '/signup', '/forgot', '/lockscreen', '/_error', '/reset' ];
 	var Routes = ctx.pathname || Router.pathname;
 	const isNotDashboard = NonDashboardRoutes.includes(Routes);
 
@@ -98,14 +101,14 @@ MyApp.getInitialProps = async ({ Component, ctx }) => {
 				ctx.req ? redirect(ctx, '/dashboard') : Router.push('/dashboard');
 			}
 		}
-		const user = await getUserLocal(token);
-		const services = await getServicesLocal();
-		var requests = await getRequestLocal(user);
-		const locations = await getLocationLocal();
-		const properties = await getPropertyLocal(user);
+		const user = await getUserLocal(hostname, token);
+		const services = await getServicesLocal(hostname);
+		var requests = await getRequestLocal(hostname, user);
+		const locations = await getLocationLocal(hostname);
+		const properties = await getPropertyLocal(hostname, user);
 
-		if (user.usertype === 'manager') {
-			var users = await getUsersLocal(token);
+		if (user.usertype === 'manager' || user.usertype === 'team-member') {
+			var users = await getUsersLocal(hostname, token);
 			ctx.store.dispatch({ type: 'USERSINFO', payload: users });
 			// userRequest = await requests;
 		}
@@ -118,7 +121,9 @@ MyApp.getInitialProps = async ({ Component, ctx }) => {
 		ctx.store.dispatch({ type: 'USERINFO', payload: user });
 	} else {
 		if (!isNotDashboard) {
-			if (Routes !== '/') {
+			if (Routes === '/' || Routes === '/about' || Routes === '/service' || Routes === '/contact') {
+				console.log(!isNotDashboard, Routes);
+			} else {
 				{
 					ctx.req ? redirect(ctx, '/signin') : Router.push('/signin');
 				}

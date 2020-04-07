@@ -42,7 +42,7 @@ export const editUser = (user, id) => (dispatch) => {
 	const token = getCookie('token');
 	// console.log(user, id);
 	axios
-		.patch(`/api/users/${id}`, {
+		.patch(`/api/users/${id}`, user, {
 			headers: {
 				Accept: 'application/json',
 				'Content-Type': 'application/json',
@@ -115,18 +115,18 @@ export const getUsers = () => (dispatch) => {
 		.catch((err) => console.log(err.response));
 };
 
-export const getUsersLocal = async (token) => {
+export const getUsersLocal = async (host, token) => {
 	// console.log(token);
 	// const token = getCookie('token'object);
 	try {
 		if (!token) return null;
-		const res = await axios.get(`/api/users`, {
+		const res = await fetch(`${host}/api/users`, {
 			headers: {
 				Accept: 'application/json',
 				Authorization: `${token}`,
 			},
 		});
-		const users = await res.data;
+		const users = await res.json();
 		// console.log(users);
 		let final = users.result.filter((data) => {
 			data.key = data._id;
@@ -134,7 +134,7 @@ export const getUsersLocal = async (token) => {
 		});
 		return final;
 	} catch (error) {
-		return console.log(error.response);
+		return console.log(error);
 	}
 };
 

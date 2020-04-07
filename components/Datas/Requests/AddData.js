@@ -130,12 +130,12 @@ class AddData1 extends Component {
 								</Select>,
 							)}
 						</FormItem>
-						<FormItem {...formItemLayout} label="Property">
+						<FormItem {...formItemLayout} label="Project Site">
 							{getFieldDecorator('propertyId', {
 								rules: [
 									{
 										required: true,
-										message: 'Please select property!',
+										message: 'Please select project site!',
 									},
 								],
 							})(

@@ -2,8 +2,6 @@ import Cors from 'micro-cors';
 import connectToDb from '../../../backend/config/db';
 import authCheck from '../../../backend/config/auth';
 import bcrypt from 'bcryptjs';
-// import { jwtSecret } from '../../../backend/config/keys';
-// import jwt from 'jsonwebtoken';
 
 const cors = Cors({
 	allowMethods: [ 'GET', 'POST', 'DELETE', 'PATCH' ],

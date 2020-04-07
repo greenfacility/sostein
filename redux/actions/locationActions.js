@@ -1,6 +1,6 @@
 // import cookie from 'react-cookies';
 // import Router from 'next/router';
-// import fetch from 'isomorphic-unfetch';
+import fetch from 'isomorphic-unfetch';
 import axios from 'axios';
 import { Message } from 'antd';
 import {
@@ -39,10 +39,10 @@ export const getLocations = () => (dispatch) => {
 		});
 };
 
-export const getLocationLocal = async () => {
+export const getLocationLocal = async (host) => {
 	try {
-		const res = await axios.get(`/api/location`);
-		const data = await res.data;
+		const res = await fetch(`${host}/api/location`);
+		const data = await res.json();
 		// console.log(data);
 
 		if (data.msg) {
@@ -55,7 +55,7 @@ export const getLocationLocal = async () => {
 		});
 		return final;
 	} catch (error) {
-		Message.error(error.response.data.msg);
+		Message.error(error.msg);
 		return;
 	}
 };

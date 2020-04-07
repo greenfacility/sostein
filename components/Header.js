@@ -50,8 +50,8 @@ const MainHeader = (props) => {
 
 					{!state.mobile && (
 						<Menu.Item>
-							<Link href="/privacy">
-								<a>Privacy</a>
+							<Link href="/contact">
+								<a>Contact</a>
 							</Link>
 						</Menu.Item>
 					)}

@@ -74,7 +74,7 @@ class PropertyTable extends Component {
 				...this.getColumnSearchProps('name'),
 			},
 			{
-				title: 'Property',
+				title: 'Site',
 				dataIndex: 'property',
 				key: 'property',
 				width: '30%',
@@ -85,7 +85,7 @@ class PropertyTable extends Component {
 				dataIndex: 'location',
 				key: 'location',
 				width: '30%',
-				...this.getColumnSearchProps('property'),
+				...this.getColumnSearchProps('location'),
 			},
 			{
 				title: 'Action',
@@ -116,7 +116,7 @@ class PropertyTable extends Component {
 			},
 		];
 		return (
-			<Card title="Property Management" style={{ padding: '0 !important', overflow: 'auto' }} extra={<AddData />}>
+			<Card title="Project Site" style={{ padding: '0 !important', overflow: 'auto' }} extra={<AddData />}>
 				<Table columns={columns} dataSource={this.props.properties.properties} />
 			</Card>
 		);
