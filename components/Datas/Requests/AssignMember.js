@@ -12,6 +12,7 @@ class AddData1 extends Component {
 		loading: false,
 		visible: false,
 		assigned: this.props.requests.request.assigned,
+		email: '',
 	};
 
 	showModal = (id) => {
@@ -23,7 +24,7 @@ class AddData1 extends Component {
 		const { validateFields } = this.props.form;
 		validateFields((err, values) => {
 			if (!err) {
-				let data = { name: this.state.assigned, id: values.assign };
+				let data = { name: this.state.assigned, id: values.assign, email: this.state.email };
 				Message.warning('Loading...').then(() =>
 					this.props.assignMember(data, this.props.requests.request._id, this.props.authentication.user),
 				);
@@ -35,7 +36,7 @@ class AddData1 extends Component {
 
 	handleChange = (e) => {
 		let user = this.props.foruser.users.find((data) => data._id === e);
-		this.setState({ assigned: `${user.firstname} ${user.lastname}` });
+		this.setState({ assigned: `${user.firstname} ${user.lastname}`, email: user.email });
 	};
 
 	render() {

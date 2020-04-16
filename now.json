@@ -1,8 +1,5 @@
 {
 	"name": "sostein",
 	"version": 2,
-	"builds": [
-		{ "src": "next.config.js", "use": "@now/next" },
-		{ "src": "chat-api/index.js", "use": "@now/node-server" }
-	]
+	"builds": [ { "src": "next.config.js", "use": "@now/next" } ]
 }

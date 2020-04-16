@@ -35,7 +35,7 @@ const handler = (req, res, db) => {
 				}
 			}
 			authCheck(req, res, db).Location
-				.update({ _id: req.query.id }, { $set: final })
+				.updateOne({ _id: req.query.id }, { $set: final })
 				.then((result) => res.status(200).json({ success: true, result }))
 				.catch((error) => res.status(500).json({ success: false, error }));
 			break;

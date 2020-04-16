@@ -57,14 +57,35 @@ const handler = (req, res, db) => {
 		case 'PATCH':
 			let newData = req.body;
 			let final = {};
-			for (let key in newData) {
-				if (newData[key] !== '') {
-					final[key] = newData[key];
-				}
-			}
 			authCheck(req, res, db).Request
-				.update({ _id: req.query.id }, { $set: final })
-				.then((result) => res.status(200).json({ success: true, result }))
+				.findById(req.query.id)
+				.then((requests) => {
+					for (let key in newData) {
+						if (newData[key] !== '') {
+							final[key] = newData[key];
+							if (key === 'assigned') {
+								const mailOption3 = {
+									from: 'No-Reply Sostein',
+									to: `${req.body.email}`,
+									subject: `Alert: A Work Order with Name "${requests.name}"`,
+									html: `<p>This is to notify you about a work order been assigned to you.</p>
+							<p>It has a description <b>${requests.description}</b> Kindly login to your account to check it out.</p><b>Thank You</b>`,
+								};
+								transporter.sendMail(mailOption3, (err, response) => {
+									if (err) {
+										console.log(err);
+									} else {
+										res.status(200).json({ success: true, data: 'Email sent successfully' });
+									}
+								});
+							}
+						}
+					}
+					authCheck(req, res, db).Request
+						.updateOne({ _id: req.query.id }, { $set: final })
+						.then((result) => res.status(200).json({ success: true, result }))
+						.catch((error) => res.status(500).json({ success: false, error }));
+				})
 				.catch((error) => res.status(500).json({ success: false, error }));
 			break;
 		case 'PUT':

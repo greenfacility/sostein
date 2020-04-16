@@ -277,7 +277,7 @@ export const getRequest = (id) => (dispatch) => {
 		})
 		.catch((err) => {
 			console.log(err);
-			Message.error(err.response.data.msg);
+			Message.error('Unable to get request');
 			dispatch(notInProgress());
 			return dispatch({ type: REQUEST_ERR, payload: err.response.data.msg });
 		});
@@ -403,7 +403,7 @@ export const changeRating = (body, id, user) => (dispatch) => {
 export const assignMember = (body, id, user) => (dispatch) => {
 	const token = getCookie('token');
 	dispatch(inProgress());
-	const data = { assigned: body.name, assignedId: body.id };
+	const data = { assigned: body.name, assignedId: body.id, email: body.email };
 	// console.log(data);
 	if (user.usertype !== 'manager') return dispatch(notInProgress());
 	axios
