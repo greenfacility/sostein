@@ -20,6 +20,9 @@ export const DELETE_REQUEST = 'DELETE_REQUEST';
 export const GET_REQUEST = 'GET_REQUEST';
 export const ADD_REQUEST = 'ADD_REQUEST';
 export const REQUEST_ERR = 'REQUEST_ERR';
+export const GET_OUTREQUEST = 'GET_OUTREQUEST';
+export const GET_OUTREQUESTS = 'GET_OUTREQUESTS';
+export const OUTREQUEST_ERR = 'OUTREQUEST_ERR';
 
 // SERVICE APIS ACTIONS
 export const GET_SERVICE = 'GET_SERVICE';
@@ -59,3 +62,6 @@ export const REQUESTOC3 = 'REQUESTOC3';
 export const REQUESTOC4 = 'REQUESTOC4';
 export const SERVICEOC2 = 'SERVICEOC2';
 export const USEROC2 = 'USEROC2';
+export const REQUESTOC22 = 'REQUESTOC22';
+export const REQUESTOC33 = 'REQUESTOC33';
+export const REQUESTOC44 = 'REQUESTOC44';

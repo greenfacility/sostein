@@ -25,6 +25,7 @@ import {
 	getServices,
 	getServicesLocal,
 	getRequestLocal,
+	getOutRequestLocal,
 	getLocationLocal,
 	getPropertyLocal,
 } from '../redux/actions';
@@ -95,6 +96,8 @@ MyApp.getInitialProps = async ({ Component, ctx }) => {
 
 	const token = getCookie('token', ctx.req);
 	// let datas;
+	const services = await getServicesLocal(hostname);
+	ctx.store.dispatch({ type: 'GET_SERVICES', payload: services });
 	if (token) {
 		if (isNotDashboard) {
 			{
@@ -102,8 +105,8 @@ MyApp.getInitialProps = async ({ Component, ctx }) => {
 			}
 		}
 		const user = await getUserLocal(hostname, token);
-		const services = await getServicesLocal(hostname);
 		var requests = await getRequestLocal(hostname, user);
+		var outrequests = await getOutRequestLocal(hostname, user);
 		const locations = await getLocationLocal(hostname);
 		const properties = await getPropertyLocal(hostname, user);
 
@@ -114,14 +117,20 @@ MyApp.getInitialProps = async ({ Component, ctx }) => {
 		}
 		// console.log(user._id, requests);
 		ctx.store.dispatch({ type: 'GET_REQUESTS', payload: requests });
-		ctx.store.dispatch({ type: 'GET_SERVICES', payload: services });
+		ctx.store.dispatch({ type: 'GET_OUTREQUESTS', payload: outrequests });
 		ctx.store.dispatch({ type: 'GET_LOCATIONS', payload: locations });
 		ctx.store.dispatch({ type: 'GET_PROPERTYS', payload: properties });
 		ctx.store.dispatch({ type: 'AUTHENTICATE', payload: user._id });
 		ctx.store.dispatch({ type: 'USERINFO', payload: user });
 	} else {
 		if (!isNotDashboard) {
-			if (Routes === '/' || Routes === '/about' || Routes === '/service' || Routes === '/contact') {
+			if (
+				Routes === '/' ||
+				Routes === '/about' ||
+				Routes === '/service' ||
+				Routes === '/contact' ||
+				Routes === '/request'
+			) {
 				console.log(!isNotDashboard, Routes);
 			} else {
 				{

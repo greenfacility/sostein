@@ -2,10 +2,9 @@ import { Table, Input, Button, Icon, Card, Divider, Dropdown, Menu, Row } from '
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { MoreVertical, Edit, Trash, PlusCircle } from 'react-feather';
-import AddData from '../Datas/Requests/AddData';
 import EditData from '../Datas/Requests/EditData';
 import AssignMember from '../Datas/Requests/AssignMember';
-import { deleteRequest } from '../../redux/actions';
+import { deleteOutRequest } from '../../redux/actions';
 import Rater from '../Rating/Rater';
 import SetTimeSchedule from '../Datas/Requests/SetTimeSchedule';
 
@@ -14,7 +13,7 @@ class RequestTable extends Component {
 		searchText: '',
 		searchedColumn: '',
 		activeTab: '1',
-		services: this.props.requests.requests,
+		services: this.props.requests.outrequests,
 	};
 
 	getColumnSearchProps = (dataIndex) => ({
@@ -73,120 +72,8 @@ class RequestTable extends Component {
 
 	render() {
 		const { usertype } = this.props.authentication.user;
-		const columns = [
-			{
-				title: 'Name',
-				dataIndex: 'name',
-				key: 'name',
-				width: '30%',
-				...this.getColumnSearchProps('name'),
-			},
-			{
-				title: 'Description',
-				dataIndex: 'description',
-				key: 'description',
-				width: '30%',
-				...this.getColumnSearchProps('description'),
-			},
-			{
-				title: 'Date',
-				dataIndex: 'date',
-				key: 'date',
-				width: '20%',
-				...this.getColumnSearchProps('date'),
-			},
-			{
-				title: 'Lifetime',
-				dataIndex: 'lifetime',
-				key: 'lifetime',
-				width: '20%',
-				...this.getColumnSearchProps('lifetime'),
-			},
-			{
-				title: 'Scheduled Time',
-				dataIndex: 'timescheduled',
-				key: 'timescheduled',
-				width: '20%',
-				...this.getColumnSearchProps('timescheduled'),
-			},
-			{
-				title: 'Type',
-				dataIndex: 'type',
-				key: 'type',
-				width: '20%',
-				...this.getColumnSearchProps('type'),
-			},
-			{
-				title: 'Project Site',
-				dataIndex: 'property',
-				key: 'property',
-				width: '20%',
-				...this.getColumnSearchProps('property'),
-			},
-			{
-				title: 'From',
-				dataIndex: 'from',
-				key: 'from',
-				width: '20%',
-				...this.getColumnSearchProps('from'),
-			},
-			{
-				title: 'Status',
-				dataIndex: 'status',
-				key: 'status',
-				width: '10%',
-				...this.getColumnSearchProps('status'),
-			},
-			{
-				title: 'Assigned',
-				dataIndex: 'assigned',
-				key: 'assigned',
-				width: '10%',
-				...this.getColumnSearchProps('assigned'),
-			},
-			{
-				title: 'Rating',
-				dataIndex: 'rating',
-				key: 'rating',
-				width: '30%',
-				// ...this.getColumnSearchProps('rating'),
-				render: (text, record) => <Rater rate={record.rating} data={record} />,
-			},
-			{
-				title: 'Action',
-				key: 'action',
-				width: '5%',
-				render: (text, record) => {
-					// console.log(record);
-					return (
-						<Dropdown
-							overlay={
-								<Menu>
-									<EditData id={record._id} />
-									{usertype === 'manager' && <AssignMember id={record._id} />}
-									{usertype === 'team-member' && <SetTimeSchedule id={record._id} />}
-									{usertype === 'manager' && (
-										<Menu.Item
-											onClick={(e) =>
-												this.props.deleteRequest(record._id, this.props.authentication.user)}
-										>
-											<Row type="flex" align="middle">
-												{' '}
-												<span>Delete</span>
-											</Row>
-										</Menu.Item>
-									)}
-								</Menu>
-							}
-						>
-							<MoreVertical size={20} strokeWidth={1} />
-						</Dropdown>
-					);
-				},
-			},
-		];
 
-		const outColumn = [
+		const columns = [
 			{
 				title: 'Full Name',
 				dataIndex: 'fullname',
@@ -280,7 +167,7 @@ class RequestTable extends Component {
 									{usertype === 'manager' && (
 										<Menu.Item
 											onClick={(e) =>
-												this.props.deleteRequest(record._id, this.props.authentication.user)}
+												this.props.deleteOutRequest(record._id, this.props.authentication.user)}
 										>
 											<Row type="flex" align="middle">
 												{' '}
@@ -299,7 +186,6 @@ class RequestTable extends Component {
 		];
 
 		var data = columns;
-		var outData = outColumn;
 		// console.log(data);
 		if (usertype !== 'manager') {
 			data = data.filter((cols) => cols.key !== 'assigned');
@@ -310,17 +196,8 @@ class RequestTable extends Component {
 				// console.log(data);
 			}
 		}
-		if (usertype !== 'manager') {
-			outData = outData.filter((cols) => cols.key !== 'assigned');
-			if (usertype !== 'team-member') {
-				// data = columns.filter((cols) => cols.key !== 'action');
-				outData = outData.filter((cols) => cols.key !== 'from');
-				outData = outData.filter((cols) => cols.key !== 'timescheduled');
-				// console.log(data);
-			}
-		}
 
-		var requests = this.props.requests.requests;
+		var requests = this.props.requests.outrequests;
 
 		var pendingReq = requests.filter((dt) => dt.status === 'pending');
 		var ongoingReq = requests.filter((dt) => dt.status === 'on-going');
@@ -330,7 +207,7 @@ class RequestTable extends Component {
 		// console.log(pendingReq);
 
 		return (
-			<Card title="Work Order Lists" style={{ padding: '0 !important', overflow: 'auto' }} extra={<AddData />}>
+			<Card title="Work Order Lists" style={{ padding: '0 !important', overflow: 'auto' }}>
 				<Menu
 					onClick={(tab) => {
 						if (this.state.activeTab !== tab.key) this.setActiveTab(tab.key);
@@ -355,4 +232,4 @@ class RequestTable extends Component {
 	}
 }
 
-export default connect((state) => state, { deleteRequest })(RequestTable);
+export default connect((state) => state, { deleteOutRequest })(RequestTable);

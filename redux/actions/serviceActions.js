@@ -44,7 +44,7 @@ export const getServicesLocal = async (host) => {
 		return final;
 	} catch (error) {
 		if (error) {
-			Message.error(error);
+			console.error(error);
 			return;
 		}
 	}

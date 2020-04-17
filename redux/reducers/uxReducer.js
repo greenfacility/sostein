@@ -12,6 +12,9 @@ import {
 	REQUESTOC4,
 	SERVICEOC2,
 	USEROC2,
+	REQUESTOC22,
+	REQUESTOC33,
+	REQUESTOC44,
 } from '../actionTypes';
 
 const uxReducer = (
@@ -27,6 +30,9 @@ const uxReducer = (
 		requestopen2: false,
 		requestopen3: false,
 		requestopen4: false,
+		requestopen22: false,
+		requestopen33: false,
+		requestopen44: false,
 		serviceopen2: false,
 		useropen2: false,
 	},
@@ -55,6 +61,12 @@ const uxReducer = (
 			return { ...state, requestopen3: !state.requestopen3 };
 		case REQUESTOC4:
 			return { ...state, requestopen4: !state.requestopen4 };
+		case REQUESTOC22:
+			return { ...state, requestopen22: !state.requestopen22 };
+		case REQUESTOC33:
+			return { ...state, requestopen33: !state.requestopen33 };
+		case REQUESTOC44:
+			return { ...state, requestopen44: !state.requestopen44 };
 		case SERVICEOC2:
 			return { ...state, serviceopen2: !state.serviceopen2 };
 		case USEROC2:

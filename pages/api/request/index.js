@@ -12,25 +12,10 @@ const handler = (req, res, db) => {
 	res.setHeader('Access-Control-Allow-Headers', '*');
 	res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, PUT, PATCH, GET, DELETE, POST');
 
-	// const job = cron.schedule('*/1 * * * *', () => {
-	// 	console.log('Cron Job is running', Date.now());
-	// });
-	// job.start();
-	// setInterval(() => {
-	// 	Request.find({})
-	// 		.populate('from type')
-	// 		.sort({ timestart: -1 })
-	// 		.then((data) => {
-	// 			// console.log(data);
-	// 			data.map(dt => {
-	// 				const time = dt.timestart
-	// 			})
-	// 		})
-	// 		.catch((err) => console.log(err));
-	// 	console.log('Set Interval is running', Date.now());
-	// }, 100000);
 	const method = req.method;
 	const Request = db.Request;
+	const RequestOut = db.RequestOut;
+
 	switch (method) {
 		case 'GET':
 			Request.find({})
@@ -49,23 +34,6 @@ const handler = (req, res, db) => {
 						}
 						return soln;
 					});
-
-					// var manup = results.map((soln) => {
-					// 	var final = {
-					// 		_id: soln._id,
-					// 		name: soln.name,
-					// 		type: `${soln.type.name}, ${soln.type.type}`,
-					// 		from: `${soln.from.firstname} ${soln.from.lastname}`,
-					// 		by_id: soln.from._id,
-					// 		assigned: `${soln.assigned.firstname} ${soln.assigned.lastname}`,
-					// 		assign_id: soln.assigned._id,
-					// 		status: soln.status,
-					// 		timestart: soln.timestart,
-					// 		timecompleted: soln.timecompleted,
-					// 	};
-					// 	return final;
-					// });
-
 					return res.status(200).json({
 						result: results,
 						status: true,
@@ -74,6 +42,38 @@ const handler = (req, res, db) => {
 				.catch((err) => res.status(500).json({ msg: 'Error while fetching data', err, status: false }));
 			break;
 		// Create new service
+		case 'PUT':
+			var { address, apartment, description, email, facility, fullname, phone, picture, type } = req.body;
+			if (
+				address != '' &&
+				apartment != '' &&
+				description != '' &&
+				email != '' &&
+				facility != '' &&
+				fullname != '' &&
+				phone != '' &&
+				type
+			) {
+				var newRequest = new RequestOut({
+					address,
+					apartment,
+					description,
+					email,
+					facility,
+					fullname,
+					phone,
+					picture,
+					type,
+				});
+				newRequest
+					.save()
+					.then((result) => res.status(201).json({ success: true, result }))
+					.catch((err) => res.status(501).json({ msg: `Not post due to ${err}` }));
+			} else {
+				res.status(500).json({ success: false, msg: 'Please enter all required field!' });
+			}
+			break;
+
 		case 'POST':
 			var { name, type, from, description, picture, property, propertyId } = req.body;
 			if (

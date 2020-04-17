@@ -55,6 +55,7 @@ const SidebarContent = ({
 		if (!token) {
 			appRoute = appRoute.filter((data) => data.path !== '/data');
 			appRoute = appRoute.filter((data) => data.path !== '/profile');
+			appRoute = appRoute.filter((data) => data.path !== '/chat');
 			appRoute = appRoute.filter((data) => data.path !== '/dashboard');
 		} else if (token) {
 			appRoute = appRoute.filter((data) => data.path !== '/signin');

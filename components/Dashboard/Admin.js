@@ -41,6 +41,7 @@ import styled from 'styled-components';
 import { theme } from '../styles/GlobalStyles';
 import ServiceTable from '../DataPage/ServiceTable';
 import RequestTable from '../DataPage/RequestTable';
+import OutRequestTable from '../DataPage/OutRequestTable';
 import { useState } from 'react';
 import { connect } from 'react-redux';
 import { getDayRequestNo } from '../../redux/actions';
@@ -312,6 +313,9 @@ const Overview = (props) => {
 				</Col>
 				<Col sm={24} md={24} className="mb-4">
 					<RequestTable />
+				</Col>
+				<Col sm={24} md={24} className="mb-4">
+					<OutRequestTable />
 				</Col>
 			</Row>
 		</div>

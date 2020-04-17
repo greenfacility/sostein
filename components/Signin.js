@@ -39,7 +39,18 @@ class Signin extends Component {
 								<img src="/images/logo.png" alt="green facilities ltd" width="100%" />
 							</a>
 						</Link>
-						<h5 className="mb-0 mt-3">Sign in</h5>
+						<h5 className="mb-0 mt-3">
+							Sign in or{' '}
+							<Link href="/request">
+								<Button
+									type="primary"
+									// block
+									className="mt-3"
+								>
+									Make a request
+								</Button>
+							</Link>
+						</h5>
 
 						<p className="text-muted">get started with our service</p>
 					</div>
